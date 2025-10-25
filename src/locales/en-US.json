@@ -1,0 +1,83 @@
+{
+	"Class": {
+		"class": "",
+		"completition": "",
+		"overseas-training": "",
+		"title": ""
+	},
+	"Course": {
+		"go-to-checkout": "",
+		"select-lessons-that-cant-join": "",
+		"title": ""
+	},
+	"Enrollment": {
+		"applied-leave-x-time": "",
+		"applied-substitution-x-time": "",
+		"back": "",
+		"confirm": "",
+		"leave-title": "",
+		"leave-type": {
+			"exam": "",
+			"other": "",
+			"school-activity": "",
+			"sick": "",
+			"travel": ""
+		}
+	},
+	"EnrollmentLeaveApplication": {
+		"apply-failed": "",
+		"apply-success": "",
+		"complete-button": "",
+		"please-enter-reason": "",
+		"please-select-leave-type": "",
+		"please-upload-proof": "",
+		"remove": "",
+		"success-title": "",
+		"upload": "",
+		"upload-proof": ""
+	},
+	"EnrollmentSubstitutionApplication": {
+		"confirm-swap": "",
+		"select-lesson": "",
+		"success-title": "",
+		"swap-failed": "",
+		"title": ""
+	},
+	"Home": {
+		"no-enrollments": "",
+		"todo": ""
+	},
+	"Lesson": {
+		"applied-for-leave": "",
+		"apply-for-leave": "",
+		"apply-for-substitution": "",
+		"next-lesson": "",
+		"num-of-lesson": "",
+		"rescheduled": "",
+		"select-other-lessons": ""
+	},
+	"Login": {
+		"failed-to-login": "",
+		"forgot-password": "",
+		"login": "",
+		"password": "",
+		"phoneNumber": "",
+		"please-fill-in-all-required-fields": "",
+		"title": ""
+	},
+	"News": {
+		"title": ""
+	},
+	"Profile": {
+		"my-lessons": "",
+		"payment": "",
+		"timetable": "",
+		"title": ""
+	},
+	"ProfilePayments": {
+		"title": ""
+	},
+	"ProfileTimetable": {
+		"title": ""
+	}
+}

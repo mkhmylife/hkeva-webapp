@@ -1,26 +1,133 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
+  --background: #F5F5F5;
   --foreground: #171717;
+  --primary: #002B76;
+  --primary-100: #C5DFF8;
+  --primary-500: #002B76;
+  --primary-900: #000C38;
+  --brand-100: #FFE3CD;
+  --brand-500: #FF2300;
+  --brand-netural-100: #C5DFF8;
+  --brand-neutral-200: #E6E8EA;
+  --brand-neutral-500: #83939C;
+  --brand-neutral-900: #283237;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-primary: var(--primary);
+  --color-primary-100: var(--primary-100);
+  --color-primary-500: var(--primary-500);
+  --color-primary-900: var(--primary-900);
+  --color-brand-100: var(--brand-100);
+  --color-brand-500: var(--brand-500);
+  --color-brand-netural-100: var(--brand-netural-100);
+  --color-brand-neutral-200: var(--brand-neutral-200);
+  --color-brand-neutral-500: var(--brand-neutral-500);
+  --color-brand-neutral-900: var(--brand-neutral-900);
 }
 
 body {
   background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--brand-neutral-900);
+}
+
+.react-international-phone-input {
+  width: 100%;
+  border: none !important;
+  font-size: 14px !important;
+  height: 40px !important;
+}
+
+.react-international-phone-country-selector-button {
+  border: none !important;
+  margin-top: 2px !important;
+}
+
+.react-calendar {
+  border: none !important;
+  background-color: transparent !important;
+}
+
+.react-calendar .react-calendar__navigation button {
+  min-width: 22px;
+  background-color: transparent !important;
+}
+
+.react-calendar .react-calendar__navigation {
+  margin-bottom: 0;
+}
+
+.react-calendar .react-calendar__tile {
+  padding: 0;
+  background-color: transparent !important;
+}
+
+.react-calendar .react-calendar__tile abbr {
+  margin: 5px;
+  padding: 20px 5px 10px;
+  display: block;
+  border-radius: 20px;
+  background-color: #FFF;
+  font-size: 15px;
+}
+
+.react-calendar .react-calendar__month-view__weekdays abbr {
+  text-decoration: none;
+  font-weight: normal;
+}
+
+.react-calendar .react-calendar__month-view__days__day--weekend {
+  color: inherit;
+}
+
+.react-calendar .react-calendar__month-view__weekdays,
+.react-calendar .react-calendar__month-view__days__day--neighboringMonth {
+  color: #283237 !important;
+  opacity: 0.4;
+}
+
+.react-calendar .react-calendar__tile {
+  position: relative;
+}
+
+.react-calendar .react-calendar__tile:before {
+  content: "";
+  border-radius: 10px;
+  width: 8px;
+  height: 8px;
+  /*background: #000;*/
+  top: 12px;
+  left: 50%;
+  margin-left: -4px;
+  position: absolute;
+}
+
+.react-calendar .react-calendar__tile abbr {
+  font-size: 16px;
+}
+
+.react-calendar .react-calendar__tile--active {
+  color: #FFF !important;
+}
+
+.react-calendar .react-calendar__tile:disabled abbr {
+  background-color: #FFF;
+  opacity: 0.5;
+}
+
+.react-calendar .react-calendar__tile--active abbr {
+  background-color: #002B76;
+}
+
+.react-calendar .react-calendar__tile.is-active {
+  color: #002B76;
+  font-weight: 500;
+}
+
+.react-calendar .react-calendar__tile.is-active:before {
+  background: #FF2300;
 }

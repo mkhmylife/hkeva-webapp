@@ -1,0 +1,83 @@
+{
+	"Class": {
+		"class": "課程",
+		"completition": "比賽",
+		"overseas-training": "海外訓練",
+		"title": "【恆常課程及活動】"
+	},
+	"Course": {
+		"go-to-checkout": "前往付款",
+		"select-lessons-that-cant-join": "選擇不能參與的課堂（最多2堂）",
+		"title": "【課程】"
+	},
+	"Enrollment": {
+		"applied-leave-x-time": "已請假{x}次",
+		"applied-substitution-x-time": "補堂次數：{x}",
+		"back": "返回",
+		"confirm": "確認",
+		"leave-title": "請選擇請假原因",
+		"leave-type": {
+			"exam": "考試",
+			"other": "其他",
+			"school-activity": "學校活動",
+			"sick": "生病",
+			"travel": "外遊"
+		}
+	},
+	"EnrollmentLeaveApplication": {
+		"apply-failed": "請假失敗，請重試",
+		"apply-success": "請假成功",
+		"complete-button": "完成",
+		"please-enter-reason": "請輸入請假原因",
+		"please-select-leave-type": "請選擇請假原因",
+		"please-upload-proof": "請上傳事假證明",
+		"remove": "移除",
+		"success-title": "請假成功",
+		"upload": "上傳",
+		"upload-proof": "上傳事假證明"
+	},
+	"EnrollmentSubstitutionApplication": {
+		"confirm-swap": "請確認想參與以上課堂作為補堂？",
+		"select-lesson": "選擇課堂",
+		"success-title": "換堂成功",
+		"swap-failed": "未能補堂，請重試",
+		"title": "補堂"
+	},
+	"Home": {
+		"no-enrollments": "沒有課堂",
+		"todo": "待辦事項"
+	},
+	"Lesson": {
+		"applied-for-leave": "已請假",
+		"apply-for-leave": "請假",
+		"apply-for-substitution": "補堂",
+		"next-lesson": "下節課堂",
+		"num-of-lesson": "節數：{i}/{total}",
+		"rescheduled": "已調堂",
+		"select-other-lessons": "選擇其他節數"
+	},
+	"Login": {
+		"failed-to-login": "登入失敗",
+		"forgot-password": "忘記密碼",
+		"login": "登入",
+		"password": "密碼",
+		"phoneNumber": "電話號碼",
+		"please-fill-in-all-required-fields": "請填妥所有項目",
+		"title": "登入"
+	},
+	"News": {
+		"title": "最新消息"
+	},
+	"Profile": {
+		"my-lessons": "我的課堂",
+		"payment": "付款",
+		"timetable": "時間表",
+		"title": "我的帳戶"
+	},
+	"ProfilePayments": {
+		"title": "付款"
+	},
+	"ProfileTimetable": {
+		"title": "時間表"
+	}
+}
