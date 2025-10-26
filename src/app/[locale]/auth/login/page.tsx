@@ -79,12 +79,12 @@ export default function LoginPage() {
                   type: 'password',
                 }}
               />
-              <Link
-                href={"/auth/forgot-password"}
-                className="text-xs text-brand-light-blue absolute right-0 top-1"
-              >
-                {t('Login.forgot-password')}
-              </Link>
+              {/*<Link*/}
+              {/*  href={"/auth/forgot-password"}*/}
+              {/*  className="text-xs text-brand-light-blue absolute right-0 top-1"*/}
+              {/*>*/}
+              {/*  {t('Login.forgot-password')}*/}
+              {/*</Link>*/}
             </div>
           )}
           name="password"

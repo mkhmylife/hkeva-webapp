@@ -1,8 +1,8 @@
 'use client';
 
 import {Bell, House, Newspaper, User, Volleyball} from "lucide-react";
-import Link from "next/link";
 import {usePathname} from "next/navigation";
+import {Link} from "@/i18n/navigation";
 
 
 export default function Footer() {

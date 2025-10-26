@@ -36,7 +36,7 @@ export default function PhoneNumberInputField({
           placeholder="請輸入電話號碼"
           value={value}
           onChange={onChange}
-          className="w-full rounded-lg overflow-hidden px-2 shadow bg-white"
+          className="w-full rounded-xl shadow-md overflow-hidden px-2 bg-white"
           // style={{
           //   '--PhoneInput-color--focus': '#3a334c',
           //   '--PhoneInputCountrySelectArrow-color': '#3a334c',
