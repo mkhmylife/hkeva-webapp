@@ -1,7 +1,6 @@
 import {PackageDto} from "@/types/packageDto";
 import {AdminUserDto} from "@/types/adminUserDto";
 import {UserDto} from "@/types/userDto";
-import {PaymentMethodsInput} from "@/components/PaymentMethodModal";
 import {ServiceDto} from "@/types/serviceDto";
 import {BranchDto} from "@/types/branchDto";
 import {PackageStatus} from "@/types/packageStatus";
@@ -81,7 +80,7 @@ export interface InvoiceDto {
       lessonId: number;
     }[];
   }[];
-  paymentMethods: PaymentMethodsInput['paymentMethods'];
+  // paymentMethods: PaymentMethodsInput['paymentMethods'];
   total: number;
   paid: number;
   due: number;

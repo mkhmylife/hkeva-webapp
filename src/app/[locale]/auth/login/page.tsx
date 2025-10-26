@@ -1,6 +1,5 @@
 'use client';
 
-import AuthHeader from "@/components/Auth/AuthHeader";
 import {useTranslations} from "next-intl";
 import {Controller, useForm} from "react-hook-form";
 import InputField from "@/components/Form/InputField";
