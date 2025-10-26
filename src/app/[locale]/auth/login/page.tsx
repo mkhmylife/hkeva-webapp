@@ -5,7 +5,7 @@ import {Controller, useForm} from "react-hook-form";
 import InputField from "@/components/Form/InputField";
 import React, {useCallback} from "react";
 import PhoneNumberInputField from "@/components/Form/PhoneNumberInputField";
-import {Link, useRouter} from "@/i18n/navigation";
+import {useRouter} from "@/i18n/navigation";
 import {login} from "@/libs/auth";
 
 interface LoginFormDto {

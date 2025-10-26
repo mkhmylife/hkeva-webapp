@@ -5,6 +5,7 @@ import {fetcher} from "@/libs/fetcher";
 import {EnrollmentDto, EnrollmentWithCountDto, EnrollmentWithInvoiceItemMiniDto} from "@/types/enrollment";
 import {ApplicationInput} from "@/components/enrollment-leave-application";
 import {LessonDto} from "@/types/lessonDto";
+import {InvoiceItemDto} from "@/types/invoiceDto";
 
 export const getCourses = async () => {
   const res = await fetcher('GET', `/app/course`);
@@ -47,7 +48,7 @@ export const getEnrolledCourses = async () => {
   if (!res.ok) {
     throw new Error(res.statusText);
   }
-  return await res.json() as CourseDto[];
+  return await res.json() as { course: CourseDto; invoiceItem: InvoiceItemDto }[];
 }
 
 export const getEnrollmentDeductible = async () => {

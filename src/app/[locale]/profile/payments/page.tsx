@@ -31,33 +31,27 @@ export default async function ProfileTimetablePage(props: Props) {
   const deductibles = await getEnrollmentDeductible();
   const holidays = await getEnrollmentHolidays();
 
-  const getInvoiceItem = (course: CourseDto) => {
-    if (!course.lessons) return null;
-    const enrollments = course.lessons.filter(l => l.enrollments).map(l => l.enrollments!).flat();
-    const invoiceItems = enrollments.filter(ii => ii).map(e => e.invoiceItem!);
-    const total = invoiceItems.reduce((a, b) => a + b.total, 0);
-    const paidAt = invoiceItems.find(ii => ii.invoiceDate)?.invoiceDate || null;
-    return {
-      total,
-      paidAt,
-    }
-  }
-
   const renderContent = () => {
     if (type === 'paid') {
       return (
         <div className="mt-4 space-y-4">
+          {courses.length === 0 ? (
+            <Card className="h-[234px] flex justify-center items-center">
+              <div className="font-semibold text-xl text-brand-neutral-900">
+                {t('Home.no-enrollments')}
+              </div>
+            </Card>
+          ) : null}
           {courses.map(course => {
-            const invoiceItem = getInvoiceItem(course);
             return (
-              <CourseCardLarge key={course.id} course={course}>
-                {invoiceItem ? (
+              <CourseCardLarge key={course.invoiceItem.id} course={course.course}>
+                {course.invoiceItem ? (
                   <>
                     <hr className="text-brand-neutral-200"/>
                     <div className="pt-4">
-                      <div className="text-right font-semibold text-xl">HK${invoiceItem.total.toLocaleString()}</div>
+                      <div className="text-right font-semibold text-xl">HK${course.invoiceItem.total.toLocaleString()}</div>
                       <div
-                        className="text-right text-brand-neutral-500 text-sm mt-2">{t('Course.paid-at', {date: moment(invoiceItem.paidAt).format('YYYY-MM-DD HH:mm')})}</div>
+                        className="text-right text-brand-neutral-500 text-sm mt-2">{t('Course.paid-at', {date: moment(course.invoiceItem.invoiceDate).format('YYYY-MM-DD HH:mm')})}</div>
                     </div>
                   </>
                 ) : null}
@@ -86,6 +80,13 @@ export default async function ProfileTimetablePage(props: Props) {
             {holidays.map((holiday) => (
               <EnrollmentHolidayStatusCard key={holiday.id} enrollment={holiday} />
             ))}
+            {holidays.length === 0 ? (
+              <Card className="h-[234px] flex justify-center items-center">
+                <div className="font-semibold text-xl text-brand-neutral-900">
+                  {t('ProfilePayments.no-holiday-records')}
+                </div>
+              </Card>
+            ) : null}
           </div>
         </div>
       )
@@ -105,7 +106,7 @@ export default async function ProfileTimetablePage(props: Props) {
       <div className="mt-3">
         <div className="mt-3 space-y-3">
           <div
-            className="bg-primary-900 rounded-full w-full grid grid-cols-3 items-center justify-between text-white p-1">
+            className="bg-primary-900 rounded-full w-full grid grid-cols-3 gap-1 items-center justify-between text-white p-1">
             <Link replace href={`/profile/payments`}
                   className={`${!type || type === "pending-payments" ? 'bg-white text-primary-900' : ''} font-semibold py-1.5 cursor-pointer rounded-full hover:bg-white hover:text-primary-900 transition-colors flex items-center justify-center`}
             >

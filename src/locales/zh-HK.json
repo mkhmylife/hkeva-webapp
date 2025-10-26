@@ -87,6 +87,7 @@
 		"deductible-amount": "可扣減金額",
 		"deductible-expired-at": "可扣減金額將於 {date} 過期",
 		"holiday-records": "請假記錄",
+		"no-holiday-records": "沒有請假記錄",
 		"paid": "已付款",
 		"pending-payments": "待付款",
 		"title": "付款"

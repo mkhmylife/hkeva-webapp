@@ -59,7 +59,7 @@ export default function EnrollmentLeaveApplication(props: Props) {
     setIsLoading(true);
     try {
       await applyEnrollmentLeave(props.enrollment.id, data);
-      alert(t('EnrollmentLeaveApplication.apply-success'));
+      // alert(t('EnrollmentLeaveApplication.apply-success'));
       router.replace(`/enrollment/${props.enrollment.id}/leave/success`);
     } catch (e) {
       alert(t('EnrollmentLeaveApplication.apply-failed'));

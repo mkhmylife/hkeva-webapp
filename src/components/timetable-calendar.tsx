@@ -25,7 +25,7 @@ export default function TimetableCalendar(props: Props) {
   }, [router]);
 
   return (
-    <div className="">
+    <div className="w-full">
       <Calendar
         onChange={(date) => onDateChange(new Date(date as never))}
         // value={field.value ? new Date(field.value) : null}
@@ -45,7 +45,7 @@ export default function TimetableCalendar(props: Props) {
           }
         }}
         view={'month'}
-        className="border-0 bg-transparent"
+        className="border-0 bg-transparent w-full!"
         calendarType={'gregory'}
         prev2Label={null}
         next2Label={null}

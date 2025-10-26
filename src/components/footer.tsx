@@ -1,18 +1,20 @@
 'use client';
 
 import {Bell, House, Newspaper, User, Volleyball} from "lucide-react";
-import {usePathname} from "next/navigation";
-import {Link} from "@/i18n/navigation";
+import {Link, usePathname} from "@/i18n/navigation";
 
+type Props = {
+  locale: string;
+}
 
-export default function Footer() {
+export default function Footer(props: Props) {
 
   const pathname = usePathname();
 
   return (
     <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full container mx-auto max-w-lg py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
       <footer className="bg-primary-900 rounded-full w-full flex items-center justify-between text-white p-1">
-        <Link href="/" className={`${pathname === "/" ? 'bg-white text-primary-900' : ''} cursor-pointer rounded-full hover:bg-white hover:text-primary-900 transition-colors h-[56px] w-[56px] flex items-center justify-center`}>
+        <Link href="/" className={`${pathname === `/` ? 'bg-white text-primary-900' : ''} cursor-pointer rounded-full hover:bg-white hover:text-primary-900 transition-colors h-[56px] w-[56px] flex items-center justify-center`}>
           <House className="w-[24px] h-[24px]"/>
         </Link>
         <Link href="/news" className={`${pathname.includes("/news") ? 'bg-white text-primary-900' : ''} cursor-pointer rounded-full p-3 hover:bg-white hover:text-primary-900 transition-colors h-[56px] w-[56px] flex items-center justify-center`}>

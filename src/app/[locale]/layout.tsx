@@ -35,7 +35,7 @@ export default async function RootLayout({
       <main className="max-w-lg mx-auto pb-20">
         {children}
       </main>
-      <Footer />
+      <Footer locale={locale} />
     </NextIntlClientProvider>
     </body>
     </html>

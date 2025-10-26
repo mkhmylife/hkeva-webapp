@@ -57,6 +57,13 @@ export default async function ProfilePage() {
 
       <h1 className="font-semibold text-md mt-5">{t('Profile.my-lessons')}</h1>
       <div className="space-y-3 mt-2">
+        {enrollments.length === 0 ? (
+          <Card className="h-[234px] flex justify-center items-center">
+            <div className="font-semibold text-xl text-brand-neutral-900">
+              {t('Home.no-enrollments')}
+            </div>
+          </Card>
+        ) : null}
         {enrollments.map((enrollment) => (
           <EnrollmentCard
             key={`enrollment-${enrollment.id}`}
