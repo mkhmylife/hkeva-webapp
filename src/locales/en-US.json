@@ -7,6 +7,7 @@
 	},
 	"Course": {
 		"go-to-checkout": "",
+		"paid-at": "",
 		"select-lessons-that-cant-join": "",
 		"title": ""
 	},
@@ -68,6 +69,13 @@
 	"News": {
 		"title": ""
 	},
+	"Notification": {
+		"last-week": "",
+		"this-week": "",
+		"title": "",
+		"today": "",
+		"yesterday": ""
+	},
 	"Profile": {
 		"my-lessons": "",
 		"payment": "",
@@ -75,9 +83,21 @@
 		"title": ""
 	},
 	"ProfilePayments": {
+		"deductible": "",
+		"deductible-amount": "",
+		"deductible-expired-at": "",
+		"holiday-records": "",
+		"paid": "",
+		"pending-payments": "",
 		"title": ""
 	},
 	"ProfileTimetable": {
+		"title": ""
+	},
+	"Settings": {
+		"about": "",
+		"language": "",
+		"logout": "",
 		"title": ""
 	}
 }

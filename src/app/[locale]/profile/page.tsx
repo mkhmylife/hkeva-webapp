@@ -45,7 +45,7 @@ export default async function ProfilePage() {
             <p className="font-semibold">{t('Profile.timetable')}</p>
           </Card>
         </Link>
-        <Link href="/src/app/[locale]/profile/payments">
+        <Link href="/profile/payments">
           <Card className="flex justify-center items-center gap-2">
             <div className="bg-primary-100 aspect-square rounded-full w-[40px] h-[40px] flex items-center justify-center">
               <CalendarCheck className="text-primary-500"/>

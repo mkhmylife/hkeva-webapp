@@ -93,7 +93,7 @@ export default function LoginPage() {
 
         <button
           onClick={handleSubmit(onSubmit)}
-          className="mt-4 w-full bg-primary text-white font-semibold py-2.5 px-4 rounded-lg transition-colors"
+          className="mt-4 w-full bg-primary text-white font-semibold py-2.5 px-4 rounded-xl transition-colors"
         >
           {t('Login.login')}
         </button>

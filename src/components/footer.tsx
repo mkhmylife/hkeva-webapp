@@ -21,7 +21,7 @@ export default function Footer() {
         <Link href="/class" className={`${pathname.includes("/class") ? 'bg-white text-primary-900' : ''} cursor-pointer rounded-full p-3 hover:bg-white hover:text-primary-900 transition-colors h-[56px] w-[56px] flex items-center justify-center`}>
           <Volleyball className="w-[24px] h-[24px]"/>
         </Link>
-        <Link href="/notification" className={`${pathname.includes("/notifications") ? 'bg-white text-primary-900' : ''} cursor-pointer rounded-full p-3 hover:bg-white hover:text-primary-900 transition-colors h-[56px] w-[56px] flex items-center justify-center`}>
+        <Link href="/notification" className={`${pathname.includes("/notification") ? 'bg-white text-primary-900' : ''} cursor-pointer rounded-full p-3 hover:bg-white hover:text-primary-900 transition-colors h-[56px] w-[56px] flex items-center justify-center`}>
           <Bell className="w-[24px] h-[24px]"/>
         </Link>
         <Link href="/profile" className={`${pathname.includes("/profile") ? 'bg-white text-primary-900' : ''} cursor-pointer rounded-full p-3 hover:bg-white hover:text-primary-900 transition-colors h-[56px] w-[56px] flex items-center justify-center`}>

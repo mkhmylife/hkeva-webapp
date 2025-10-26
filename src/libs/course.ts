@@ -2,7 +2,7 @@
 
 import {CourseDto} from "@/types/courseDto";
 import {fetcher} from "@/libs/fetcher";
-import {EnrollmentDto, EnrollmentWithCountDto} from "@/types/enrollment";
+import {EnrollmentDto, EnrollmentWithCountDto, EnrollmentWithInvoiceItemMiniDto} from "@/types/enrollment";
 import {ApplicationInput} from "@/components/enrollment-leave-application";
 import {LessonDto} from "@/types/lessonDto";
 
@@ -36,6 +36,30 @@ export const getEnrollments = async (date?: string) => {
     sp.append('date', date);
   }
   const res = await fetcher('GET', `/app/enrollment?${sp.toString()}`);
+  if (!res.ok) {
+    throw new Error(res.statusText);
+  }
+  return await res.json() as EnrollmentDto[];
+}
+
+export const getEnrolledCourses = async () => {
+  const res = await fetcher('GET', `/app/enrollment/course`);
+  if (!res.ok) {
+    throw new Error(res.statusText);
+  }
+  return await res.json() as CourseDto[];
+}
+
+export const getEnrollmentDeductible = async () => {
+  const res = await fetcher('GET', `/app/enrollment/deductible`);
+  if (!res.ok) {
+    throw new Error(res.statusText);
+  }
+  return await res.json() as { total: number; expiredAt: string };
+}
+
+export const getEnrollmentHolidays = async () => {
+  const res = await fetcher('GET', `/app/enrollment/holidays`);
   if (!res.ok) {
     throw new Error(res.statusText);
   }

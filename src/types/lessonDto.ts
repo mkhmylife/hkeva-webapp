@@ -1,5 +1,6 @@
 import {CourseDto} from "@/types/courseDto";
 import {RoomDto} from "@/types/roomDto";
+import {EnrollmentDto} from "@/types/enrollment";
 
 export interface LessonDto {
   id: number;
@@ -22,4 +23,5 @@ export interface LessonDto {
   cancelledAt?: string;
   cancelReason?: string;
   replacementLessonId?: number;
+  enrollments?: EnrollmentDto[];
 }
