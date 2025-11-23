@@ -28,7 +28,6 @@ export default function TimetableCalendar(props: Props) {
   return (
     <div className="w-full">
       <Calendar
-        suppressHydrationWarning
         onChange={(date) => onDateChange(new Date(date as never))}
         // value={field.value ? new Date(field.value) : null}
         minDate={new Date()}
