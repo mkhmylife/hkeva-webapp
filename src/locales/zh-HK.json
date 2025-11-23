@@ -1,4 +1,9 @@
 {
+	"Area": {
+		"hong-kong": "香港島",
+		"kowloon": "九龍",
+		"new-territories": "新界"
+	},
 	"Class": {
 		"class": "課程",
 		"completition": "比賽",
@@ -6,10 +11,28 @@
 		"title": "【恆常課程及活動】"
 	},
 	"Course": {
+		"fixed-room": "固定",
 		"go-to-checkout": "前往付款",
+		"not-fixed-room": "非固定",
 		"paid-at": "已於 {date} 付款",
 		"select-lessons-that-cant-join": "選擇不能參與的課堂（最多2堂）",
 		"title": "【課程】"
+	},
+	"CourseFilterButton": {
+		"age": "年齡",
+		"apply-filter": "篩選",
+		"area": "地區",
+		"day": "日子",
+		"level": "級別",
+		"title": "篩選條件"
+	},
+	"CourseRenew": {
+		"current-course": "在讀課堂",
+		"next-step": "下一步",
+		"only-two-holidays-can-be-picked": "最多只可選擇2堂",
+		"payment": "付款",
+		"select-course": "選擇課堂",
+		"title": "續報"
 	},
 	"Enrollment": {
 		"applied-leave-x-time": "已請假{x}次",
@@ -46,16 +69,21 @@
 	},
 	"Home": {
 		"no-enrollments": "沒有課堂",
+		"no-todos": "沒有待辦事項",
 		"todo": "待辦事項"
 	},
 	"Lesson": {
 		"applied-for-leave": "已請假",
 		"apply-for-leave": "請假",
-		"apply-for-substitution": "補堂",
+		"apply-for-substitution": "申請補堂",
 		"next-lesson": "下節課堂",
 		"num-of-lesson": "節數：{i}/{total}",
 		"rescheduled": "已調堂",
-		"select-other-lessons": "選擇其他節數"
+		"select-other-lessons": "選擇其他節數",
+		"swap-approved": "已批准",
+		"swap-pending": "待審批",
+		"swap-rejected": "拒絕",
+		"swap-status": "狀態"
 	},
 	"Login": {
 		"failed-to-login": "登入失敗",
@@ -71,16 +99,21 @@
 	},
 	"Notification": {
 		"last-week": "過往",
+		"past": "過往",
 		"this-week": "本週",
 		"title": "通知",
 		"today": "今天",
 		"yesterday": "昨天"
 	},
 	"Profile": {
+		"clothes-size": "球衣碼數",
+		"clothes-size-change-confirm": "你確定你的球衣碼數是 {size}？",
 		"my-lessons": "我的課堂",
 		"payment": "付款",
 		"timetable": "時間表",
-		"title": "我的帳戶"
+		"title": "我的帳戶",
+		"upload-pic": "上傳大頭貼",
+		"uploading-pic": "上傳中..."
 	},
 	"ProfilePayments": {
 		"deductible": "可扣減金額",
@@ -99,6 +132,7 @@
 		"about": "關於",
 		"language": "語言",
 		"logout": "登出",
+		"profile": "帳號",
 		"title": "設定"
 	}
 }

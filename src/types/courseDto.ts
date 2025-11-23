@@ -19,6 +19,7 @@ export interface CourseDto {
   defaultRoom?: RoomDto;
   category?: CategoryDto;
   category2?: CategoryDto;
+  isFixedRoom: boolean;
 }
 
 export interface MemberCourseDto extends CourseDto {

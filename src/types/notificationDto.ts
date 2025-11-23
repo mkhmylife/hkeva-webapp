@@ -14,4 +14,9 @@ export interface NotificationDto {
   courses?: CourseDto[];
   lessons?: LessonDto[];
   users?: UserDto[];
+  type: 'NewCourse' | 'PaymentReminder' | 'LessonTimeChange' | 'LessonCancellation' | 'LessonLocationChange' | 'General';
+}
+
+export interface UserNotificationDto extends NotificationDto {
+  isRead: boolean;
 }

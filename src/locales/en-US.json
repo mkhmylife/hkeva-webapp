@@ -1,4 +1,9 @@
 {
+	"Area": {
+		"hong-kong": "",
+		"kowloon": "",
+		"new-territories": ""
+	},
 	"Class": {
 		"class": "",
 		"completition": "",
@@ -6,9 +11,27 @@
 		"title": ""
 	},
 	"Course": {
+		"fixed-room": "",
 		"go-to-checkout": "",
+		"not-fixed-room": "",
 		"paid-at": "",
 		"select-lessons-that-cant-join": "",
+		"title": ""
+	},
+	"CourseFilterButton": {
+		"age": "",
+		"apply-filter": "",
+		"area": "",
+		"day": "",
+		"level": "",
+		"title": ""
+	},
+	"CourseRenew": {
+		"current-course": "",
+		"next-step": "Next",
+		"only-two-holidays-can-be-picked": "",
+		"payment": "Payment",
+		"select-course": "",
 		"title": ""
 	},
 	"Enrollment": {
@@ -46,6 +69,7 @@
 	},
 	"Home": {
 		"no-enrollments": "",
+		"no-todos": "",
 		"todo": ""
 	},
 	"Lesson": {
@@ -55,7 +79,11 @@
 		"next-lesson": "",
 		"num-of-lesson": "",
 		"rescheduled": "",
-		"select-other-lessons": ""
+		"select-other-lessons": "",
+		"swap-approved": "Approved",
+		"swap-pending": "Pending",
+		"swap-rejected": "Rejected",
+		"swap-status": "Status"
 	},
 	"Login": {
 		"failed-to-login": "",
@@ -71,16 +99,21 @@
 	},
 	"Notification": {
 		"last-week": "",
+		"past": "",
 		"this-week": "",
 		"title": "",
 		"today": "",
 		"yesterday": ""
 	},
 	"Profile": {
+		"clothes-size": "Clothes Size",
+		"clothes-size-change-confirm": "",
 		"my-lessons": "",
 		"payment": "",
 		"timetable": "",
-		"title": ""
+		"title": "",
+		"upload-pic": "Upload Profile Pic",
+		"uploading-pic": "Uploading..."
 	},
 	"ProfilePayments": {
 		"deductible": "",
@@ -99,6 +132,7 @@
 		"about": "",
 		"language": "",
 		"logout": "",
+		"profile": "Profile",
 		"title": ""
 	}
 }

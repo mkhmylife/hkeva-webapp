@@ -9,4 +9,5 @@ export interface RoomDto {
   type: RoomType;
   isAvailableToThai: boolean;
   cannotPerformServiceMap: string[];
+  mapUrl?: string;
 }

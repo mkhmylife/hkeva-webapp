@@ -6,6 +6,8 @@ import Card from "@/components/card";
 import {getTranslations} from "next-intl/server";
 import ToDoCard from "@/components/todo-card";
 import {Link} from "@/i18n/navigation";
+import {LessonEnrollmentStatus} from "@/types/enrollment";
+import {getToDos} from "@/libs/user";
 
 type Props = {
   params: Promise<{
@@ -26,6 +28,8 @@ export default async function Home(props: Props) {
   const enrollments = await getEnrollments();
   const todayEnrollments = await getEnrollments(selectedDate.toISOString());
 
+  const toDos = await getToDos();
+
   return (
     <div className="container px-4 sm:px-6 lg:px-8 pb-10">
       {todayEnrollments.length === 0 ? (
@@ -35,13 +39,18 @@ export default async function Home(props: Props) {
           </div>
         </Card>
       ) : null}
-      <div className="space-y-3">
+      <div className="space-y-2">
         {todayEnrollments.map(enrollment => (
-          <EnrollmentCard
+          <Link
+            href={`/profile/timetable?date=${moment(enrollment.lesson.date).format('YYYY-MM-DD')}`}
             key={`today-enrollment-${enrollment.id}`}
-            enrollment={enrollment}
-            buttonType='leave-sub'
-          />
+            className="block"
+          >
+            <EnrollmentCard
+              enrollment={enrollment}
+              buttonType='status'
+            />
+          </Link>
         ))}
       </div>
 
@@ -55,10 +64,11 @@ export default async function Home(props: Props) {
       <div className="mt-3">
         <h2 className="font-semibold text-lg">{t('Home.todo')}</h2>
         <div className="mt-2 space-y-3">
-          {[1,2,3].map((item) => (
-            <Link href={`/class/courses`} className="block" key={`todo-link-${item}`}>
-              <ToDoCard />
-            </Link>
+          {toDos.length === 0 ? (
+            <div className="text-center text-gray-400 py-10">{t('Home.no-todos')}</div>
+          ) : null}
+          {toDos.map((item, index) => (
+            <ToDoCard key={`todo-${index}`} toDo={item} />
           ))}
         </div>
       </div>

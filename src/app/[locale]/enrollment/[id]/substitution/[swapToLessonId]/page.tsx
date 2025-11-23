@@ -1,11 +1,9 @@
 import {getEnrollment, getLesson} from "@/libs/course";
 import {getTranslations} from "next-intl/server";
 import EnrollmentCard from "@/components/enrollment-card";
-import {ArrowDown, Check, ChevronLeft} from "lucide-react";
-import {Link} from "@/i18n/navigation";
+import {ArrowDown, ChevronLeft} from "lucide-react";
 import BackButton from "@/components/back-button";
 import React from "react";
-import LessonCardLarge from "@/components/lesson-card-large";
 import EnrollmentSubstitutionApplication from "@/components/enrollment-substitution-application";
 
 type Props = {
@@ -15,7 +13,6 @@ type Props = {
     swapToLessonId: number;
   }>;
 }
-
 
 export default async function EnrollmentSubstitutionSwapToPage(props: Props) {
 

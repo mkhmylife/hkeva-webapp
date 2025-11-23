@@ -13,6 +13,12 @@ export enum LessonEnrollmentStatus {
   Cancelled = 'Cancelled',
 }
 
+export enum SwapApproveStatus {
+  Pending = 'Pending',
+  Approved = 'Approved',
+  Rejected = 'Rejected',
+}
+
 export interface EnrollmentDto {
   id: number;
   status: LessonEnrollmentStatus;
@@ -24,6 +30,7 @@ export interface EnrollmentDto {
   swapTo?: EnrollmentDto;
   swapFrom?: EnrollmentDto;
   invoiceItem?: InvoiceItemMiniDto;
+  swapApproveStatus: SwapApproveStatus;
 }
 
 export interface EnrollmentWithInvoiceItemMiniDto extends EnrollmentDto {

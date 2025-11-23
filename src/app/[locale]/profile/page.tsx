@@ -5,6 +5,7 @@ import Card from "@/components/card";
 import {getEnrollments} from "@/libs/course";
 import EnrollmentCard from "@/components/enrollment-card";
 import {Link} from "@/i18n/navigation";
+import React from "react";
 
 export default async function ProfilePage() {
 
@@ -19,7 +20,12 @@ export default async function ProfilePage() {
 
       <div className="flex gap-5 mt-5">
         <div className="bg-primary-100 aspect-square rounded-full w-[69px] h-[69px] flex items-center justify-center">
-          <User className="text-primary size-8"/>
+          {me.profilePicUrl ? (
+            <img src={`${process.env.NEXT_PUBLIC_CDN_URL}/members/images/${me.profilePicUrl}`} alt=""
+                 className="w-full aspect-square rounded-full shadow overflow-hidden object-cover"/>
+          ) : (
+            <User className="text-primary size-8"/>
+          )}
         </div>
         <div className="flex-1">
           <div className="flex items-center gap-3">

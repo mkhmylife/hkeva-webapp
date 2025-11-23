@@ -9,7 +9,7 @@ import Card from "@/components/card";
 import ImageUploading, {ImageListType} from 'react-images-uploading';
 import {Images} from "lucide-react";
 import {applyEnrollmentLeave} from "@/libs/course";
-import {EnrollmentDto, EnrollmentWithCountDto} from "@/types/enrollment";
+import {EnrollmentWithCountDto} from "@/types/enrollment";
 import {useRouter} from "next/navigation";
 
 export type ApplicationInput = {
@@ -58,8 +58,7 @@ export default function EnrollmentLeaveApplication(props: Props) {
     }
     setIsLoading(true);
     try {
-      await applyEnrollmentLeave(props.enrollment.id, data);
-      // alert(t('EnrollmentLeaveApplication.apply-success'));
+      const enrollment = await applyEnrollmentLeave(props.enrollment.id, data);
       router.replace(`/enrollment/${props.enrollment.id}/leave/success`);
     } catch (e) {
       alert(t('EnrollmentLeaveApplication.apply-failed'));
@@ -115,7 +114,7 @@ export default function EnrollmentLeaveApplication(props: Props) {
             {t('Enrollment.leave-type.travel')}
           </a>
         </div>
-        {activeType && ['exam', 'school-activity', 'travel'].includes(activeType) ? (
+        {activeType && ['sick', 'exam', 'school-activity', 'travel'].includes(activeType) ? (
           <Card className="p-4">
             <div className="font-semibold text-center mb-3">{t('EnrollmentLeaveApplication.upload-proof')}</div>
             <Controller

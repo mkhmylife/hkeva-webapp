@@ -10,6 +10,7 @@ import {useRouter} from "@/i18n/navigation";
 
 type Props = {
   enrollments: EnrollmentDto[];
+  initialDate: string;
 }
 
 export default function TimetableCalendar(props: Props) {
@@ -27,9 +28,11 @@ export default function TimetableCalendar(props: Props) {
   return (
     <div className="w-full">
       <Calendar
+        suppressHydrationWarning
         onChange={(date) => onDateChange(new Date(date as never))}
         // value={field.value ? new Date(field.value) : null}
         minDate={new Date()}
+        defaultValue={new Date(props.initialDate)}
         defaultActiveStartDate={lessonDates ? lessonDates[0] : undefined}
         prevLabel={<ChevronLeft strokeWidth={1.2} className="text-brand-neutral-900"/>}
         nextLabel={<ChevronRight strokeWidth={1.2} className="text-brand-neutral-900"/>}

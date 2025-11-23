@@ -2,7 +2,8 @@
 
 import {fetcher} from "./fetcher";
 import {notFound, redirect} from "next/navigation";
-import {AuthUserDto} from "@/types/userDto";
+import {AuthUserDto, ToDoDto} from "@/types/userDto";
+import {NotificationDto, UserNotificationDto} from "@/types/notificationDto";
 
 export const getMe = async () => {
   const res = await fetcher('GET', `/app/me`);
@@ -18,6 +19,23 @@ export const getMe = async () => {
   return await res.json() as AuthUserDto;
 }
 
+export const getToDos = async () => {
+  const res = await fetcher('GET', `/app/me/to-do`);
+  if (!res.ok) {
+    throw new Error(res.statusText);
+  }
+  return await res.json() as ToDoDto[];
+}
+
+export const getNotifications = async () => {
+  const res = await fetcher('GET', `/app/me/notification`);
+  if (!res.ok) {
+    throw new Error(res.statusText);
+  }
+  return await res.json() as UserNotificationDto[];
+}
+
+
 export const updateProfile = async (payload: {
   name: string;
   email: string;
@@ -31,6 +49,24 @@ export const updateProfile = async (payload: {
   healthQ5Other?: string;
 }) => {
   const res = await fetcher('PUT', `/user/me`, payload);
+  if (!res.ok) {
+    throw new Error(res.statusText);
+  }
+}
+
+export const updateProfilePic = async (payload: {
+  filename: string;
+  contentType: string;
+  data: string;
+}) => {
+  const res = await fetcher('PUT', `/app/me/profile-pic`, payload);
+  if (!res.ok) {
+    throw new Error(res.statusText);
+  }
+}
+
+export const updateClothesSize = async (size: string) => {
+  const res = await fetcher('PUT', `/app/me/clothes-size`, { size });
   if (!res.ok) {
     throw new Error(res.statusText);
   }

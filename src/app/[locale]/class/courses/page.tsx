@@ -1,6 +1,3 @@
-import {useTranslations} from "next-intl";
-import Card from "@/components/card";
-import {ChevronRight, GitFork, Plane, Volleyball} from "lucide-react";
 import {Link} from "@/i18n/navigation";
 import {getTranslations} from "next-intl/server";
 import {getCourses} from "@/libs/course";
@@ -22,7 +19,6 @@ export default async function CoursesPage() {
             <CourseCard course={course} />
           </Link>
         ))}
-
       </div>
     </div>
   );

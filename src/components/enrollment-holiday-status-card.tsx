@@ -3,14 +3,12 @@ import {getTranslations} from "next-intl/server";
 import {convertWeekdayToNumber} from "@/libs/weekday";
 import moment from "moment/moment";
 import {Link} from "@/i18n/navigation";
-import {EnrollmentDto, LessonEnrollmentStatus} from "@/types/enrollment";
+import {EnrollmentDto, LessonEnrollmentStatus, SwapApproveStatus} from "@/types/enrollment";
 import {getEnrollment} from "@/libs/course";
 import BackButton from "@/components/back-button";
 
 type Props = {
   enrollment: EnrollmentDto;
-  buttonType?: 'leave-sub' | 'back';
-  isSwap?: boolean;
 }
 
 export default async function EnrollmentHolidayStatusCard(props: Props) {
@@ -22,48 +20,26 @@ export default async function EnrollmentHolidayStatusCard(props: Props) {
   const enrollmentWithCount = await getEnrollment(props.enrollment.id);
 
   const renderButton = () => {
-    if (props.buttonType === 'leave-sub') {
-      if (props.enrollment.status === LessonEnrollmentStatus.Enrolled) {
-        return (
-          <div className="mt-2.5 grid grid-cols-2 gap-2">
-            <Link href={`/enrollment/${props.enrollment.id}/leave`}
-                  className="bg-primary-100 rounded-xl py-2 block text-center font-medium">
-              {t('Lesson.apply-for-leave')}
-            </Link>
-            <Link href={`/enrollment/${props.enrollment.id}/substitution`}
-                  className="bg-primary text-white rounded-xl py-2 block text-center font-medium">
-              {t('Lesson.apply-for-substitution')}
-            </Link>
-          </div>
-        )
-      }
-      if (props.enrollment.status === LessonEnrollmentStatus.Holiday) {
-        return (
-          <div className="mt-2.5 grid grid-cols-1 gap-2">
-            <div className="bg-primary-100 opacity-50 rounded-xl py-2 block text-center font-medium">
-              {t('Lesson.applied-for-leave')}
-            </div>
-          </div>
-        );
-      }
-      if (props.enrollment.status === LessonEnrollmentStatus.Rescheduled) {
-        return (
-          <div className="mt-2.5 grid grid-cols-1 gap-2">
-            <div className="bg-primary-100 opacity-50 rounded-xl py-2 block text-center font-medium">
-              {t('Lesson.rescheduled')}
-            </div>
-          </div>
-        );
-      }
-      return null;
+    if (!props.enrollment.hasSwapped) {
+      return (
+        <div className="mt-2.5 grid grid-cols-1 gap-2">
+          <Link href={`/enrollment/${props.enrollment.id}/substitution`}
+                className="bg-primary text-white rounded-xl py-1 block text-center font-medium">
+            {t('Lesson.apply-for-substitution')}
+          </Link>
+        </div>
+      );
     }
-    return (
-      <div className="mt-2.5 grid grid-cols-1 gap-2">
-        <BackButton className="bg-primary-100 rounded-xl py-2 block text-center font-medium">
-          {t('Lesson.select-other-lessons')}
-        </BackButton>
-      </div>
-    )
+    if (props.enrollment.status === LessonEnrollmentStatus.Rescheduled) {
+      return (
+        <div className="mt-2.5 grid grid-cols-1 gap-2">
+          <div className="bg-primary-100 opacity-50 rounded-xl py-1 block text-center font-medium">
+            {t('Lesson.rescheduled')}
+          </div>
+        </div>
+      );
+    }
+    return null;
   };
 
   const renderNextInfo = () => {
@@ -80,6 +56,23 @@ export default async function EnrollmentHolidayStatusCard(props: Props) {
 
   return (
     <Card>
+      <div className="flex justify-between text-xs">
+        <p>
+          {[LessonEnrollmentStatus.Holiday, LessonEnrollmentStatus.Rescheduled].includes(props.enrollment.status) ? (
+            <>
+              {t('Lesson.applied-for-leave')}
+            </>
+          ) : (
+            <>
+              {t('Lesson.next-lesson')}
+            </>
+          )}
+        </p>
+        <div className={`${props.enrollment.swapApproveStatus === SwapApproveStatus.Approved ? 'text-[#116608] bg-[#D5FAAA]' : props.enrollment.swapApproveStatus === SwapApproveStatus.Pending ? 'bg-[#FFF0CB] text-[#C25400]' : 'bg-[#FED2A1] text-[#911D06]'} py-[3px] px-2 font-medium rounded-2xl`}>
+          {t(`Lesson.swap-status`)}：
+          {t(`Lesson.swap-${props.enrollment.swapApproveStatus.toLowerCase()}`)}
+        </div>
+      </div>
       <div className="mb-1 flex justify-between items-center gap-1">
         <h2 className="font-medium text-lg line-clamp-1">
           {props.enrollment.swapFrom ? `(補)` : null}
@@ -115,8 +108,7 @@ export default async function EnrollmentHolidayStatusCard(props: Props) {
         </p>
       </div>
       <p className="text-xs tracking-wider font-medium text-brand-neutral-500">{lesson.course?.code}</p>
-      {props.buttonType ? renderButton() : null}
-      {props.isSwap ? renderNextInfo() : null}
+      {renderButton()}
     </Card>
   )
 

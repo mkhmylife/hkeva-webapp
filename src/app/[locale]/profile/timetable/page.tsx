@@ -23,7 +23,7 @@ export default async function ProfileTimetablePage(props: Props) {
 
   const t = await getTranslations();
 
-  const selectedDate = date ? moment(date).toDate() : moment();
+  const selectedDate = date ? moment(date) : moment();
   const enrollments = await getEnrollments();
   const todayEnrollments = await getEnrollments(selectedDate.toISOString());
 
@@ -58,7 +58,10 @@ export default async function ProfileTimetablePage(props: Props) {
       </div>
 
       <div className="mt-3">
-        <TimetableCalendar enrollments={enrollments} />
+        <TimetableCalendar
+          enrollments={enrollments}
+          initialDate={selectedDate.toISOString()}
+        />
       </div>
     </div>
   )

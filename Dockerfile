@@ -26,6 +26,7 @@ ENV TZ=Asia/Hong_Kong
 
 ARG SESSION_SECRET
 ARG NEXT_PUBLIC_API_URL
+ARG NEXT_PUBLIC_CDN_URL="https://bliss-staging.sgp1.cdn.digitaloceanspaces.com"
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .

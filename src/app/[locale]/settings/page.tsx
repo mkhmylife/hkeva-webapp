@@ -1,6 +1,6 @@
 import {getTranslations} from "next-intl/server";
 import BackButton from "@/components/back-button";
-import {ChevronLeft, ChevronRight, CircleQuestionMark, Globe, LogOut, Volleyball} from "lucide-react";
+import {ChevronLeft, ChevronRight, CircleQuestionMark, Globe, LogOut, User, Volleyball} from "lucide-react";
 import React from "react";
 import {Link} from "@/i18n/navigation";
 import Card from "@/components/card";
@@ -20,6 +20,15 @@ export default async function SettingsPage() {
       </BackButton>
 
       <div className="mt-4 space-y-4">
+        <Link href="/profile/settings" className="block">
+          <Card className="flex gap-3 items-center">
+            <div className="w-[40px] h-[40px] flex items-center justify-center bg-brand-netural-100 rounded-full">
+              <User className="w-[24px] h-[24px] text-primary-500"/>
+            </div>
+            <div className="">{t('Settings.profile')}</div>
+            <ChevronRight strokeWidth={1.2} className="ml-auto -mr-1 text-brand-neutral-500 opacity-50 size-8" />
+          </Card>
+        </Link>
         <Link href="/" className="block">
           <Card className="flex gap-3 items-center">
             <div className="w-[40px] h-[40px] flex items-center justify-center bg-brand-netural-100 rounded-full">

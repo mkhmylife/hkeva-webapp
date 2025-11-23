@@ -78,7 +78,10 @@ export default async function ProfileTimetablePage(props: Props) {
           <h2 className="mt-5 font-semibold text-lg">{t('ProfilePayments.holiday-records')}</h2>
           <div className="mt-2 space-y-4">
             {holidays.map((holiday) => (
-              <EnrollmentHolidayStatusCard key={holiday.id} enrollment={holiday} />
+              <EnrollmentHolidayStatusCard
+                key={holiday.id}
+                enrollment={holiday}
+              />
             ))}
             {holidays.length === 0 ? (
               <Card className="h-[234px] flex justify-center items-center">

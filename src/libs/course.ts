@@ -2,13 +2,33 @@
 
 import {CourseDto} from "@/types/courseDto";
 import {fetcher} from "@/libs/fetcher";
-import {EnrollmentDto, EnrollmentWithCountDto, EnrollmentWithInvoiceItemMiniDto} from "@/types/enrollment";
+import {EnrollmentDto, EnrollmentWithCountDto} from "@/types/enrollment";
 import {ApplicationInput} from "@/components/enrollment-leave-application";
 import {LessonDto} from "@/types/lessonDto";
 import {InvoiceItemDto} from "@/types/invoiceDto";
 
-export const getCourses = async () => {
-  const res = await fetcher('GET', `/app/course`);
+export const getCourses = async (query?: {
+  level?: string;
+  area?: string;
+  age?: string;
+  day?: string;
+}) => {
+  const sp = new URLSearchParams();
+  if (query) {
+    if (query.level) {
+      sp.append('level', query.level);
+    }
+    if (query.area) {
+      sp.append('area', query.area);
+    }
+    if (query.age) {
+      sp.append('age', query.age);
+    }
+    if (query.day) {
+      sp.append('day', query.day);
+    }
+  }
+  const res = await fetcher('GET', `/app/course?${sp.toString()}`);
   if (!res.ok) {
     throw new Error(res.statusText);
   }
@@ -88,7 +108,7 @@ export const applyEnrollmentLeave = async (id: number, dto: ApplicationInput) =>
   if (!res.ok) {
     throw new Error(res.statusText);
   }
-  return true;
+  return await res.json() as EnrollmentDto;
 }
 
 export const applyEnrollmentSubstitution = async (enrollmentId: number, swapToLessonId: number) => {

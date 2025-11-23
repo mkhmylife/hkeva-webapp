@@ -29,7 +29,7 @@ export default async function EnrollmentLeavePage(props: Props) {
         />
       </div>
 
-      <div className="mt-5">
+      <div className="mt-5 mb-5">
         <EnrollmentLeaveApplication enrollment={enrollment} />
       </div>
     </div>

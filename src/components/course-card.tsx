@@ -41,6 +41,11 @@ export default function CourseCard(props: Props) {
               fill="#002B76"/>
           </svg>
           <p className="text-xs">{course.defaultRoom?.name}</p>
+          {!course.isFixedRoom ? (
+            <div className="text-[10px] text-[#911D06] bg-[#FED2A1] rounded-full py-0.5 px-1.5 font-medium">{t('Course.not-fixed-room')}</div>
+            ) : (
+            <div className="text-[10px] text-[#116608] bg-[#D5FAAA] rounded-full py-0.5 px-1.5 font-medium">{t('Course.fixed-room')}</div>
+          )}
         </div>
         <div className="flex items-center gap-2 mb-1.5">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">

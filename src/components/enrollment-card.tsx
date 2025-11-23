@@ -3,13 +3,13 @@ import {getTranslations} from "next-intl/server";
 import {convertWeekdayToNumber} from "@/libs/weekday";
 import moment from "moment/moment";
 import {Link} from "@/i18n/navigation";
-import {EnrollmentDto, LessonEnrollmentStatus} from "@/types/enrollment";
+import {EnrollmentDto, LessonEnrollmentStatus, SwapApproveStatus} from "@/types/enrollment";
 import {getEnrollment} from "@/libs/course";
 import BackButton from "@/components/back-button";
 
 type Props = {
   enrollment: EnrollmentDto;
-  buttonType?: 'leave-sub' | 'back';
+  buttonType?: 'leave-sub' | 'status' | 'back';
   isSwap?: boolean;
 }
 
@@ -22,34 +22,35 @@ export default async function EnrollmentCard(props: Props) {
   const enrollmentWithCount = await getEnrollment(props.enrollment.id);
 
   const renderButton = () => {
-    if (props.buttonType === 'leave-sub') {
-      if (props.enrollment.status === LessonEnrollmentStatus.Enrolled) {
+    if (props.buttonType === 'leave-sub' || props.buttonType === 'status') {
+      if (props.enrollment.status === LessonEnrollmentStatus.Enrolled && props.buttonType === 'leave-sub') {
         return (
-          <div className="mt-2.5 grid grid-cols-2 gap-2">
+          <div className="mt-2.5 grid grid-cols-1 gap-2">
             <Link href={`/enrollment/${props.enrollment.id}/leave`}
-                  className="bg-primary-100 rounded-xl py-2 block text-center font-medium">
+                  className="bg-primary-100 rounded-xl py-1 block text-center font-medium">
               {t('Lesson.apply-for-leave')}
             </Link>
-            <Link href={`/enrollment/${props.enrollment.id}/substitution`}
-                  className="bg-primary text-white rounded-xl py-2 block text-center font-medium">
-              {t('Lesson.apply-for-substitution')}
-            </Link>
+            {/*<Link href={`/enrollment/${props.enrollment.id}/substitution`}*/}
+            {/*      className="bg-primary text-white rounded-xl py-2 block text-center font-medium">*/}
+            {/*  {t('Lesson.apply-for-substitution')}*/}
+            {/*</Link>*/}
           </div>
         )
       }
-      if (props.enrollment.status === LessonEnrollmentStatus.Holiday) {
+      if (props.enrollment.status === LessonEnrollmentStatus.Holiday && props.enrollment.swapApproveStatus === SwapApproveStatus.Approved) {
         return (
           <div className="mt-2.5 grid grid-cols-1 gap-2">
-            <div className="bg-primary-100 opacity-50 rounded-xl py-2 block text-center font-medium">
-              {t('Lesson.applied-for-leave')}
-            </div>
+            <Link href={`/enrollment/${props.enrollment.id}/substitution`}
+                  className="bg-primary text-white rounded-xl py-1 block text-center font-medium">
+              {t('Lesson.apply-for-substitution')}
+            </Link>
           </div>
         );
       }
       if (props.enrollment.status === LessonEnrollmentStatus.Rescheduled) {
         return (
           <div className="mt-2.5 grid grid-cols-1 gap-2">
-            <div className="bg-primary-100 opacity-50 rounded-xl py-2 block text-center font-medium">
+            <div className="bg-primary-100 opacity-50 rounded-xl py-1 block text-center font-medium">
               {t('Lesson.rescheduled')}
             </div>
           </div>
@@ -59,7 +60,7 @@ export default async function EnrollmentCard(props: Props) {
     }
     return (
       <div className="mt-2.5 grid grid-cols-1 gap-2">
-        <BackButton className="bg-primary-100 rounded-xl py-2 block text-center font-medium">
+        <BackButton className="bg-primary-100 rounded-xl py-1 block text-center font-medium">
           {t('Lesson.select-other-lessons')}
         </BackButton>
       </div>
@@ -69,11 +70,38 @@ export default async function EnrollmentCard(props: Props) {
   const renderNextInfo = () => {
     return (
       <div className="pt-2 flex justify-between items-center text-xs mb-2">
-        <p>{t('Lesson.next-lesson')}</p>
-        <div className="bg-primary-100 py-[3px] px-2 font-medium rounded-2xl">{t('Lesson.num-of-lesson', {
-          total: enrollmentWithCount.enrollmentCounts,
-          i: enrollmentWithCount.enrollmentIndex
-        })}</div>
+        <>
+          <p>
+            {[LessonEnrollmentStatus.Holiday, LessonEnrollmentStatus.Rescheduled].includes(props.enrollment.status) ? (
+              <>
+                {t('Lesson.applied-for-leave')}
+              </>
+            ) : (
+              <>
+                {props.enrollment.hasSwapped ? (
+                  <>
+                    {t('Lesson.rescheduled')}
+                  </>
+                ) : (
+                  <>
+                    {t('Lesson.next-lesson')}
+                  </>
+                )}
+              </>
+            )}
+          </p>
+          {[LessonEnrollmentStatus.Holiday, LessonEnrollmentStatus.Rescheduled].includes(props.enrollment.status) ? (
+            <div className={`${props.enrollment.swapApproveStatus === SwapApproveStatus.Approved ? 'text-[#116608] bg-[#D5FAAA]' : props.enrollment.swapApproveStatus === SwapApproveStatus.Pending ? 'bg-[#FFF0CB] text-[#C25400]' : 'bg-[#FED2A1] text-[#911D06]'} py-[3px] px-2 font-medium rounded-2xl`}>
+              {t(`Lesson.swap-status`)}：
+              {t(`Lesson.swap-${props.enrollment.swapApproveStatus.toLowerCase()}`)}
+            </div>
+          ) : (
+            <div className="bg-primary-100 py-[3px] px-2 font-medium rounded-2xl">{t('Lesson.num-of-lesson', {
+              total: enrollmentWithCount.enrollmentCounts,
+              i: enrollmentWithCount.enrollmentIndex
+            })}</div>
+          )}
+        </>
       </div>
     )
   };
@@ -90,14 +118,14 @@ export default async function EnrollmentCard(props: Props) {
           {lesson.course?.category2?.name}
         </div>
       </div>
-      <div className="flex items-center gap-2 mb-2">
+      <Link href={lesson.room?.mapUrl || '/'} target="_blank" className="flex items-center gap-2 mb-2">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path
             d="M12 1.5C9.81273 1.50248 7.71575 2.37247 6.16911 3.91911C4.62247 5.46575 3.75248 7.56273 3.75 9.75C3.75 16.8094 11.25 22.1409 11.5697 22.3641C11.6958 22.4524 11.846 22.4998 12 22.4998C12.154 22.4998 12.3042 22.4524 12.4303 22.3641C12.75 22.1409 20.25 16.8094 20.25 9.75C20.2475 7.56273 19.3775 5.46575 17.8309 3.91911C16.2843 2.37247 14.1873 1.50248 12 1.5ZM12 6.75C12.5933 6.75 13.1734 6.92595 13.6667 7.25559C14.1601 7.58524 14.5446 8.05377 14.7716 8.60195C14.9987 9.15013 15.0581 9.75333 14.9424 10.3353C14.8266 10.9172 14.5409 11.4518 14.1213 11.8713C13.7018 12.2909 13.1672 12.5766 12.5853 12.6924C12.0033 12.8081 11.4001 12.7487 10.8519 12.5216C10.3038 12.2946 9.83524 11.9101 9.50559 11.4167C9.17595 10.9234 9 10.3433 9 9.75C9 8.95435 9.31607 8.19129 9.87868 7.62868C10.4413 7.06607 11.2044 6.75 12 6.75Z"
             fill="#002B76"/>
         </svg>
         <p className="">{lesson.room?.name}</p>
-      </div>
+      </Link>
       <div className="flex items-center gap-2 mb-2.5">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path
