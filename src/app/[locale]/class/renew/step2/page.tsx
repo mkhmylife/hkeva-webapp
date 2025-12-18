@@ -1,5 +1,5 @@
 import {getTranslations} from "next-intl/server";
-import {getCourse} from "@/libs/course";
+import {getCourse, getCourseEnrollmentStatus} from "@/libs/course";
 import {Volleyball} from "lucide-react";
 import {convertWeekdayToNumber} from "@/libs/weekday";
 import moment from "moment/moment";
@@ -24,7 +24,11 @@ export default async function CourseDetailPage(props: Props) {
   const t = await getTranslations();
 
   const { fromCourseId, toCourseId } = await props.searchParams;
-  const course = await getCourse(Number(toCourseId));
+  const [course, status] = await Promise.all([
+    getCourse(Number(toCourseId)),
+    getCourseEnrollmentStatus(Number(toCourseId)),
+  ]);
+
   const lessons = course.lessons;
   const firstLesson = lessons && lessons.length > 0 ? lessons[0] : null;
 
@@ -95,6 +99,7 @@ export default async function CourseDetailPage(props: Props) {
         <CourseRenewHolidayPicker
           course={course}
           fromCourseId={fromCourseId}
+          isFull={!status.canEnroll}
         />
       </div>
     </div>

@@ -11,6 +11,8 @@ export enum LessonEnrollmentStatus {
   Holiday = 'Holiday',
   Rescheduled = 'Rescheduled',
   Cancelled = 'Cancelled',
+  InvoiceSwapped = 'InvoiceSwapped',
+  InvoiceSwappedAsPoint = 'InvoiceSwappedAsPoint',
 }
 
 export enum SwapApproveStatus {
@@ -31,6 +33,8 @@ export interface EnrollmentDto {
   swapFrom?: EnrollmentDto;
   invoiceItem?: InvoiceItemMiniDto;
   swapApproveStatus: SwapApproveStatus;
+  value: number;
+  expiredAt: string;
 }
 
 export interface EnrollmentWithInvoiceItemMiniDto extends EnrollmentDto {

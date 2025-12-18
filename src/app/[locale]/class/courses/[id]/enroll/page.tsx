@@ -1,11 +1,9 @@
 import {getTranslations} from "next-intl/server";
 import {getCourse} from "@/libs/course";
-import {ChevronLeft, Volleyball} from "lucide-react";
+import {ChevronLeft} from "lucide-react";
 import {convertWeekdayToNumber} from "@/libs/weekday";
 import moment from "moment/moment";
-import CourseCalendar from "@/components/course-calendar";
 import React from "react";
-import {Link} from "@/i18n/navigation";
 import BackButton from "@/components/back-button";
 import CourseCardLarge from "@/components/course-card-large";
 import CourseEnrollButton from "@/components/course-enroll-button";
@@ -13,10 +11,9 @@ import CourseEnrollButton from "@/components/course-enroll-button";
 type Props = {
   params: Promise<{
     locale: string;
+    id: string;
   }>;
   searchParams: Promise<{
-    fromCourseId: string;
-    toCourseId: string;
     holiday1?: string;
     holiday2?: string;
   }>;
@@ -26,8 +23,9 @@ export default async function CourseDetailPage(props: Props) {
 
   const t = await getTranslations();
 
-  const { fromCourseId, toCourseId, holiday1, holiday2 } = await props.searchParams;
-  const course = await getCourse(Number(toCourseId));
+  const { id: courseId } = await props.params;
+  const { holiday1, holiday2 } = await props.searchParams;
+  const course = await getCourse(Number(courseId));
   const lessons = course.lessons;
   const firstLesson = lessons && lessons.length > 0 ? lessons[0] : null;
   const enrolledLessons = lessons?.filter((lesson) => {
@@ -42,7 +40,7 @@ export default async function CourseDetailPage(props: Props) {
           <div className="rounded-full border border-brand-neutral-300 w-[24px] h-[24px] flex items-center justify-center shadow cursor-pointer block">
             <ChevronLeft className="text-brand-neutral-900 size-5" strokeWidth={1.2} />
           </div>
-          <h1 className="text-lg font-semibold">{t('CourseRenew.payment')}</h1>
+          <h1 className="text-lg font-semibold">{t('Course.confirm-enrollment')}</h1>
         </BackButton>
 
         <div className="mt-2">
@@ -88,7 +86,6 @@ export default async function CourseDetailPage(props: Props) {
         <CourseEnrollButton
           course={course}
           holidays={[holiday1, holiday2].filter(h => h !== undefined)}
-          isRenewal={true}
         />
       </div>
     </div>

@@ -4,6 +4,13 @@
 		"kowloon": "",
 		"new-territories": ""
 	},
+	"Checkout": {
+		"subtotal": "",
+		"total": "",
+		"use-points": "",
+		"use-points-to-save": "",
+		"used-points": ""
+	},
 	"Class": {
 		"class": "",
 		"completition": "",
@@ -11,6 +18,8 @@
 		"title": ""
 	},
 	"Course": {
+		"confirm-and-pay": "",
+		"confirm-enrollment": "",
 		"fixed-room": "",
 		"go-to-checkout": "",
 		"not-fixed-room": "",
@@ -28,6 +37,8 @@
 	},
 	"CourseRenew": {
 		"current-course": "",
+		"grade-too-low-to-enroll": "",
+		"is-full": "",
 		"next-step": "Next",
 		"only-two-holidays-can-be-picked": "",
 		"payment": "Payment",
@@ -76,6 +87,7 @@
 		"applied-for-leave": "",
 		"apply-for-leave": "",
 		"apply-for-substitution": "",
+		"cancelled": "",
 		"next-lesson": "",
 		"num-of-lesson": "",
 		"rescheduled": "",
@@ -119,9 +131,11 @@
 		"deductible": "",
 		"deductible-amount": "",
 		"deductible-expired-at": "",
+		"goto-payment": "",
 		"holiday-records": "",
 		"no-holiday-records": "",
 		"paid": "",
+		"pay-now": "",
 		"pending-payments": "",
 		"title": ""
 	},

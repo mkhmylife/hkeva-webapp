@@ -1,12 +1,12 @@
 import {getTranslations} from "next-intl/server";
-import {getCourse} from "@/libs/course";
+import {getCourse, getCourseEnrollmentStatus} from "@/libs/course";
 import {Volleyball} from "lucide-react";
 import {convertWeekdayToNumber} from "@/libs/weekday";
 import moment from "moment/moment";
-import CourseCalendar from "@/components/course-calendar";
 import React from "react";
-import {Link} from "@/i18n/navigation";
 import BackButton from "@/components/back-button";
+import CourseHolidayPicker from "@/components/course-holiday-picker";
+import {getMe} from "@/libs/user";
 
 type Props = {
   params: Promise<{
@@ -20,7 +20,13 @@ export default async function CourseDetailPage(props: Props) {
   const t = await getTranslations();
 
   const { id } = await props.params;
-  const course = await getCourse(id);
+
+  const [course, status, me] = await Promise.all([
+    getCourse(id),
+    getCourseEnrollmentStatus(id),
+    getMe()
+  ]);
+
   const lessons = course.lessons;
   const firstLesson = lessons && lessons.length > 0 ? lessons[0] : null;
 
@@ -88,16 +94,11 @@ export default async function CourseDetailPage(props: Props) {
 
         <hr className="text-brand-neutral-200 my-5"/>
 
-        {/*<h2 className="font-semibold text-lg">{t('Course.select-lessons-that-cant-join')}</h2>*/}
-
-        <CourseCalendar course={course}/>
-
-        {/*<Link*/}
-        {/*  href={`/classes/courses/${course.id}/checkout`}*/}
-        {/*  className="block text-center mt-4 w-full bg-brand-500 text-white font-semibold py-2.5 px-4 rounded-[12px] transition-colors"*/}
-        {/*>*/}
-        {/*  {t('Course.go-to-checkout')}*/}
-        {/*</Link>*/}
+        <CourseHolidayPicker
+          course={course}
+          user={me}
+          isFull={!status.canEnroll}
+        />
       </div>
     </div>
   );

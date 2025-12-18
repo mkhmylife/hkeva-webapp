@@ -6,14 +6,15 @@ import React, {useCallback, useMemo} from "react";
 import {useTranslations} from "next-intl";
 import {Link} from "@/i18n/navigation";
 import moment from "moment";
+import {AuthUserDto} from "@/types/userDto";
 
 type IProps = {
   course: CourseDto;
-  fromCourseId: string;
+  user: AuthUserDto;
   isFull?: boolean;
 }
 
-export default function CourseRenewHolidayPicker(props: IProps) {
+export default function CourseHolidayPicker(props: IProps) {
 
   const t = useTranslations();
 
@@ -33,18 +34,22 @@ export default function CourseRenewHolidayPicker(props: IProps) {
   }, [holidays, t]);
 
   const nextUrl = useMemo(() => {
-    const sp = new URLSearchParams({
-      fromCourseId: props.fromCourseId,
-      toCourseId: props.course.id.toString(),
-    });
+    const sp = new URLSearchParams();
     if (holidays.length >= 1) {
       sp.append('holiday1', moment(holidays[0]).format('YYYY-MM-DD'));
     }
     if (holidays.length === 2) {
       sp.append('holiday2', moment(holidays[1]).format('YYYY-MM-DD'));
     }
-    return `/class/renew/step3?${sp.toString()}`;
-  }, [holidays, props.fromCourseId, props.course.id]);
+    return `/class/courses/${props.course.id}/enroll?${sp.toString()}`;
+  }, [holidays, props.course.id]);
+
+  const canUserEnroll = useMemo(() => {
+    if (props.user.category) {
+      return props.user.category.order >= (props.course.category2?.order || 0);
+    }
+    return true;
+  }, [props.course.category2?.order, props.user.category]);
 
   return (
     <div className="relative">
@@ -75,18 +80,26 @@ export default function CourseRenewHolidayPicker(props: IProps) {
         href={nextUrl}
         className="block text-center mt-4 w-full bg-primary text-white font-semibold py-2.5 px-4 rounded-[12px] transition-colors"
       >
-        {props.isFull ? (
+        {canUserEnroll ? (
           <>
-            {t('CourseRenew.is-full')}
+            {props.isFull ? (
+              <>
+                {t('CourseRenew.is-full')}
+              </>
+            ) : (
+              <>
+                {t('CourseRenew.next-step')}
+              </>
+            )}
           </>
         ) : (
           <>
-            {t('CourseRenew.next-step')}
+            {t('CourseRenew.grade-too-low-to-enroll')}
           </>
         )}
       </Link>
 
-      {props.isFull ? (
+      {!canUserEnroll || props.isFull ? (
         <div className="absolute bg-background/50 h-full w-full inset-0" />
       ) : null}
     </div>

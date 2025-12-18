@@ -1,15 +1,24 @@
-import {useTranslations} from "next-intl";
 import Card from "@/components/card";
 import {ChevronRight, GitFork, Plane, Volleyball} from "lucide-react";
 import {Link} from "@/i18n/navigation";
+import React from "react";
+import {getTranslations} from "next-intl/server";
 
-export default function ClassesPage() {
+export default async function ClassesPage() {
 
-  const t = useTranslations();
+  const t = await getTranslations();
+  // const me = await getMe();
 
   return (
     <div className="container px-4 sm:px-6 lg:px-8">
-      <h1 className="font-semibold text-lg">{t('Class.title')}</h1>
+      {/*<div className="flex justify-between items-center">*/}
+      {/*  <div />*/}
+      {/*  <div className="flex items-center gap-4">*/}
+      {/*    <div className="text-sm bg-primary-100 text-brand-neutral-900 py-1 px-2.5 rounded-full whitespace-pre">*/}
+      {/*      {me.level}*/}
+      {/*    </div>*/}
+      {/*  </div>*/}
+      {/*</div>*/}
 
       <div className="mt-4 space-y-4">
         <Link href="/class/courses" className="block">

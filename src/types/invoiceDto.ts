@@ -6,6 +6,7 @@ import {BranchDto} from "@/types/branchDto";
 import {PackageStatus} from "@/types/packageStatus";
 import {ProductDto} from "@/types/productDto";
 import {CourseDto} from "@/types/courseDto";
+import {LessonEnrollmentStatus} from "@/types/enrollment";
 
 export interface InvoiceDto {
   id: number;
@@ -78,6 +79,8 @@ export interface InvoiceDto {
       enrollmentId: number;
       isAttended: boolean;
       lessonId: number;
+      value: number;
+      status: LessonEnrollmentStatus;
     }[];
   }[];
   // paymentMethods: PaymentMethodsInput['paymentMethods'];

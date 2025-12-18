@@ -1,16 +1,14 @@
 import {getTranslations} from "next-intl/server";
 import BackButton from "@/components/back-button";
-import {ChevronLeft, WalletMinimal} from "lucide-react";
+import {ChevronLeft} from "lucide-react";
 import React from "react";
 import {getEnrolledCourses, getEnrollmentDeductible, getEnrollmentHolidays} from "@/libs/course";
 import moment from "moment/moment";
 import {Link} from "@/i18n/navigation";
 import CourseCardLarge from "@/components/course-card-large";
-import {CourseDto} from "@/types/courseDto";
 import Card from "@/components/card";
-import LessonCard from "@/components/lesson-card";
-import EnrollmentCard from "@/components/enrollment-card";
 import EnrollmentHolidayStatusCard from "@/components/enrollment-holiday-status-card";
+import DeductibleCardsSwiper from "@/components/deductible-cards-swiper";
 
 type Props = {
   params: Promise<{
@@ -31,18 +29,21 @@ export default async function ProfileTimetablePage(props: Props) {
   const deductibles = await getEnrollmentDeductible();
   const holidays = await getEnrollmentHolidays();
 
+  const paidCourses = courses.filter(c => c.invoiceItem.invoiceDue === 0);
+  const pendingPaymentCourses = courses.filter(c => c.invoiceItem.invoiceDue > 0);
+
   const renderContent = () => {
     if (type === 'paid') {
       return (
         <div className="mt-4 space-y-4">
-          {courses.length === 0 ? (
+          {paidCourses.length === 0 ? (
             <Card className="h-[234px] flex justify-center items-center">
               <div className="font-semibold text-xl text-brand-neutral-900">
                 {t('Home.no-enrollments')}
               </div>
             </Card>
           ) : null}
-          {courses.map(course => {
+          {paidCourses.map(course => {
             return (
               <CourseCardLarge key={course.invoiceItem.id} course={course.course}>
                 {course.invoiceItem ? (
@@ -64,17 +65,7 @@ export default async function ProfileTimetablePage(props: Props) {
     if (type === 'deductible') {
       return (
         <div className="mt-4">
-          <Card>
-            <p className="text-sm font-medium">{t('ProfilePayments.deductible-amount')}</p>
-            <div className="mt-3 flex gap-4">
-              <WalletMinimal className="text-brand-neutral-500 size-8"/>
-              <div className="text-4xl font-medium">
-                HK${deductibles.total.toLocaleString()}
-              </div>
-            </div>
-            <p
-              className="mt-2 text-sm text-brand-neutral-500">{t('ProfilePayments.deductible-expired-at', {date: moment(deductibles.expiredAt).format('YYYY-MM-DD')})}</p>
-          </Card>
+          <DeductibleCardsSwiper deductibles={deductibles} />
           <h2 className="mt-5 font-semibold text-lg">{t('ProfilePayments.holiday-records')}</h2>
           <div className="mt-2 space-y-4">
             {holidays.map((holiday) => (
@@ -91,6 +82,38 @@ export default async function ProfileTimetablePage(props: Props) {
               </Card>
             ) : null}
           </div>
+        </div>
+      )
+    }
+    if (type === 'pending-payments' || !type) {
+      return (
+        <div className="mt-4 space-y-4">
+          {pendingPaymentCourses.length === 0 ? (
+            <Card className="h-[234px] flex justify-center items-center">
+              <div className="font-semibold text-xl text-brand-neutral-900">
+                {t('Home.no-enrollments')}
+              </div>
+            </Card>
+          ) : null}
+          {pendingPaymentCourses.map(course => {
+            return (
+              <Link key={course.invoiceItem.id} href={`/profile/payments/checkout?invoiceId=${course.invoiceItem.invoiceId}&courseId=${course.course.id}`}>
+                <CourseCardLarge course={course.course}>
+                  {course.invoiceItem ? (
+                    <>
+                      <hr className="text-brand-neutral-200"/>
+                      <div className="pt-4">
+                        <div className="text-right font-semibold text-xl">HK${course.invoiceItem.total.toLocaleString()}</div>
+                      </div>
+                      <a className="cursor-pointer w-full bg-primary-100 rounded-xl py-2 px-6 mt-4 block text-center font-medium">
+                        {t('ProfilePayments.goto-payment')}
+                      </a>
+                    </>
+                  ) : null}
+                </CourseCardLarge>
+              </Link>
+            )
+          })}
         </div>
       )
     }

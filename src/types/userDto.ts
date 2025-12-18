@@ -2,6 +2,7 @@ import {BranchDto} from "@/types/branchDto";
 import {CourseDto} from "@/types/courseDto";
 import {LessonDto} from "@/types/lessonDto";
 import {EnrollmentDto} from "@/types/enrollment";
+import {CategoryDto} from "@/types/categoryDto";
 
 export interface UserDto {
   id: number;
@@ -47,6 +48,7 @@ export interface AuthUserDto {
   tel: string;
   email: string;
   level: string;
+  category?: CategoryDto;
   profilePicUrl?: string;
   clothingSize?: string;
 }

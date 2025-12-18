@@ -56,6 +56,15 @@ export default async function EnrollmentCard(props: Props) {
           </div>
         );
       }
+      if (props.enrollment.status === LessonEnrollmentStatus.Cancelled) {
+        return (
+          <div className="mt-2.5 grid grid-cols-1 gap-2">
+            <div className="bg-brand-500 text-white opacity-50 rounded-xl py-1 block text-center font-medium">
+              {t('Lesson.cancelled')}
+            </div>
+          </div>
+        );
+      }
       return null;
     }
     return (

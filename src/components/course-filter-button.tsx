@@ -8,14 +8,14 @@ import {convertWeekdayToNumber} from "@/libs/weekday";
 import {usePathname, useRouter} from "@/i18n/navigation";
 
 type Input = {
-  area: string;
-  level: string;
-  age: string;
-  day: string;
+  area: string[]; // changed to array for multi-select
+  level: string[];
+  age: string[];
+  day: string[];
 }
 
 type IProps = {
-  initialValues?: Partial<Input>;
+  initialValues?: Partial<Input> | { area?: string; level?: string; age?: string; day?: string } ; // keys may come as CSV string from query
 }
 
 export default function CourseFilterButton(props: IProps) {
@@ -30,23 +30,23 @@ export default function CourseFilterButton(props: IProps) {
 
   const applyFilter = useCallback((data: Input) => {
     const sp = new URLSearchParams(window.location.search);
-    if (data.area) {
-      sp.set('area', data.area);
+    if (data.area && data.area.length) {
+      sp.set('area', data.area.join(','));
     } else {
       sp.delete('area');
     }
-    if (data.level) {
-      sp.set('level', data.level);
+    if (data.level && data.level.length) {
+      sp.set('level', data.level.join(','));
     } else {
       sp.delete('level');
     }
-    if (data.age) {
-      sp.set('age', data.age);
+    if (data.age && data.age.length) {
+      sp.set('age', data.age.join(','));
     } else {
       sp.delete('age');
     }
-    if (data.day) {
-      sp.set('day', data.day);
+    if (data.day && data.day.length) {
+      sp.set('day', data.day.join(','));
     } else {
       sp.delete('day');
     }
@@ -58,10 +58,36 @@ export default function CourseFilterButton(props: IProps) {
 
   useEffect(() => {
     if (props.initialValues) {
-      console.log(11);
       Object.entries(props.initialValues).forEach(([key, value]) => {
         if (value) {
-          setValue(key as keyof Input, value);
+          if (key === 'area') {
+            // support comma-separated string from query or an array
+            if (typeof value === 'string') {
+              setValue('area', value.split(',').filter(v => v));
+            } else if (Array.isArray(value)) {
+              setValue('area', value as string[]);
+            } else {
+              // unknown shape, ignore
+            }
+          } else if (key === 'level') {
+            if (typeof value === 'string') {
+              setValue('level', value.split(',').filter(v => v));
+            } else if (Array.isArray(value)) {
+              setValue('level', value as string[]);
+            }
+          } else if (key === 'age') {
+            if (typeof value === 'string') {
+              setValue('age', value.split(',').filter(v => v));
+            } else if (Array.isArray(value)) {
+              setValue('age', value as string[]);
+            }
+          } else if (key === 'day') {
+            if (typeof value === 'string') {
+              setValue('day', value.split(',').filter(v => v));
+            } else if (Array.isArray(value)) {
+              setValue('day', value as string[]);
+            }
+          }
         }
       });
     }
@@ -102,11 +128,21 @@ export default function CourseFilterButton(props: IProps) {
                               label: 'new-territories', value: '新界'
                             }
                           ].map(item => {
+                            const selected = Array.isArray(value) && value.includes(item.value);
                             return (
                               <a
                                 key={item.label}
-                                onClick={() => value === item.value ? onChange(null) : onChange(item.value)}
-                                className={`${value === item.value ? 'bg-primary text-white font-medium' : 'bg-brand-netural-100'} text-center rounded-md py-2`}
+                                onClick={() => {
+                                  const current = Array.isArray(value) ? value.slice() : [];
+                                  const idx = current.indexOf(item.value);
+                                  if (idx > -1) {
+                                    current.splice(idx, 1);
+                                  } else {
+                                    current.push(item.value);
+                                  }
+                                  onChange(current);
+                                }}
+                                className={`${selected ? 'bg-primary text-white font-medium' : 'bg-brand-netural-100'} text-center rounded-md py-2`}
                               >
                                 {t(`Area.${item.label}`)}
                               </a>
@@ -132,14 +168,24 @@ export default function CourseFilterButton(props: IProps) {
                             }, {
                               label: '中階', value: '中階'
                             }, {
-                              label: '高階', value: '高階'
+                              label: '進階', value: '進階'
                             }
                           ].map(item => {
+                            const selected = Array.isArray(value) && value.includes(item.value);
                             return (
                               <a
                                 key={item.label}
-                                onClick={() => value === item.value ? onChange(null) : onChange(item.value)}
-                                className={`${value === item.value ? 'bg-primary text-white font-medium' : 'bg-brand-netural-100'} text-center rounded-md py-2`}
+                                onClick={() => {
+                                  const current = Array.isArray(value) ? value.slice() : [];
+                                  const idx = current.indexOf(item.value);
+                                  if (idx > -1) {
+                                    current.splice(idx, 1);
+                                  } else {
+                                    current.push(item.value);
+                                  }
+                                  onChange(current);
+                                }}
+                                className={`${selected ? 'bg-primary text-white font-medium' : 'bg-brand-netural-100'} text-center rounded-md py-2`}
                               >
                                 {item.label}
                               </a>
@@ -159,17 +205,44 @@ export default function CourseFilterButton(props: IProps) {
                           {[
                             {
                               label: 'U6', value: 'U6'
-                            }, {
+                            },
+                            {
+                              label: 'U8', value: 'U8'
+                            },
+                            {
+                              label: 'U10', value: 'U10'
+                            },
+                            {
+                              label: 'U12', value: 'U12'
+                            },
+                            {
+                              label: 'U14', value: 'U14'
+                            },
+                            {
                               label: 'U15', value: 'U15'
-                            }, {
-                              label: '成人', value: 'adult'
+                            },
+                            {
+                              label: 'U16', value: 'U16'
+                            },
+                            {
+                              label: '成人', value: '成人'
                             }
                           ].map(item => {
+                            const selected = Array.isArray(value) && value.includes(item.value);
                             return (
                               <a
                                 key={item.label}
-                                onClick={() => value === item.value ? onChange(null) : onChange(item.value)}
-                                className={`${value === item.value ? 'bg-primary text-white font-medium' : 'bg-brand-netural-100'} text-center rounded-md py-2`}
+                                onClick={() => {
+                                  const current = Array.isArray(value) ? value.slice() : [];
+                                  const idx = current.indexOf(item.value);
+                                  if (idx > -1) {
+                                    current.splice(idx, 1);
+                                  } else {
+                                    current.push(item.value);
+                                  }
+                                  onChange(current);
+                                }}
+                                className={`${selected ? 'bg-primary text-white font-medium' : 'bg-brand-netural-100'} text-center rounded-md py-2`}
                               >
                                 {item.label}
                               </a>
@@ -187,11 +260,22 @@ export default function CourseFilterButton(props: IProps) {
                       render={({field: {onChange, value}}) => (
                         <div className="grid grid-cols-7 gap-2 mt-2 text-xs">
                           {[...Array(7).keys()].map(item => {
+                            const val = item.toString();
+                            const selected = Array.isArray(value) && value.includes(val);
                             return (
                               <a
                                 key={`day-${item}`}
-                                onClick={() => value === item.toString() ? onChange(null) : onChange(item.toString())}
-                                className={`${value === item.toString() ? 'bg-primary text-white font-medium' : 'bg-brand-netural-100'} text-center rounded-md py-2`}
+                                onClick={() => {
+                                  const current = Array.isArray(value) ? value.slice() : [];
+                                  const idx = current.indexOf(val);
+                                  if (idx > -1) {
+                                    current.splice(idx, 1);
+                                  } else {
+                                    current.push(val);
+                                  }
+                                  onChange(current);
+                                }}
+                                className={`${selected ? 'bg-primary text-white font-medium' : 'bg-brand-netural-100'} text-center rounded-md py-2`}
                               >
                                 {convertWeekdayToNumber(item)}
                               </a>
