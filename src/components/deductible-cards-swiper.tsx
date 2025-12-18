@@ -20,7 +20,19 @@ export default function DeductibleCardsSwiper(props: IProps) {
   const t = useTranslations();
 
   if (props.deductibles.length === 0) {
-    return null;
+    return (
+      <Card>
+        <p className="text-sm font-medium">{t('ProfilePayments.deductible-amount')}</p>
+        <div className="flex gap-4 mt-3">
+          <WalletMinimal className="text-brand-neutral-500 size-8"/>
+          <div className="text-4xl font-medium">
+            HK$0
+          </div>
+        </div>
+        <p
+          className="mt-2 text-sm text-brand-neutral-500"></p>
+      </Card>
+    )
   }
 
   return (

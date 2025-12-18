@@ -25,9 +25,11 @@ export default async function ProfileTimetablePage(props: Props) {
 
   const t = await getTranslations();
 
-  const courses = await getEnrolledCourses();
-  const deductibles = await getEnrollmentDeductible();
-  const holidays = await getEnrollmentHolidays();
+  const [courses, deductibles, holidays] = await Promise.all([
+    getEnrolledCourses(),
+    getEnrollmentDeductible(),
+    getEnrollmentHolidays(),
+  ]);
 
   const paidCourses = courses.filter(c => c.invoiceItem.invoiceDue === 0);
   const pendingPaymentCourses = courses.filter(c => c.invoiceItem.invoiceDue > 0);
@@ -139,12 +141,12 @@ export default async function ProfileTimetablePage(props: Props) {
               {t('ProfilePayments.pending-payments')}
             </Link>
             <Link replace href={`/profile/payments?type=paid`}
-              className={`${type === "paid" ? 'bg-white text-primary-900' : ''} font-semibold py-1.5 cursor-pointer rounded-full hover:bg-white hover:text-primary-900 transition-colors flex items-center justify-center`}
+                  className={`${type === "paid" ? 'bg-white text-primary-900' : ''} font-semibold py-1.5 cursor-pointer rounded-full hover:bg-white hover:text-primary-900 transition-colors flex items-center justify-center`}
             >
               {t('ProfilePayments.paid')}
             </Link>
             <Link replace href={`/profile/payments?type=deductible`}
-              className={`${type === "deductible" ? 'bg-white text-primary-900' : ''} font-semibold py-1.5 cursor-pointer rounded-full hover:bg-white hover:text-primary-900 transition-colors flex items-center justify-center`}
+                  className={`${type === "deductible" ? 'bg-white text-primary-900' : ''} font-semibold py-1.5 cursor-pointer rounded-full hover:bg-white hover:text-primary-900 transition-colors flex items-center justify-center`}
             >
               {t('ProfilePayments.deductible')}
             </Link>

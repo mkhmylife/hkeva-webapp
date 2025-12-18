@@ -7,7 +7,6 @@ import {verifyAuth} from "@/libs/auth";
 export const fetcher = async (method: string, path: string, body?: any) => {
 
   const auth = await verifyAuth();
-  console.log(process.env.API_URL, process.env.NEXT_PUBLIC_API_URL);
   const res = await fetch(`${process.env.API_URL || process.env.NEXT_PUBLIC_API_URL}${path}`, {
     method,
     body: body ? JSON.stringify(body) : undefined,
