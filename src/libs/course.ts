@@ -12,9 +12,13 @@ export const getCourses = async (query?: {
   area?: string | string[];
   age?: string | string[];
   day?: string | string[];
+  category?: string;
 }) => {
   const sp = new URLSearchParams();
   if (query) {
+    if (query.category) {
+      sp.append('category', query.category);
+    }
     if (query.level) {
       if (Array.isArray(query.level)) {
         sp.append('level', query.level.join(','));

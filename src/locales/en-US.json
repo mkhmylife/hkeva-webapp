@@ -11,6 +11,10 @@
 		"use-points-to-save": "",
 		"used-points": ""
 	},
+	"InvoiceCountdown": {
+		"expired": "This invoice has expired",
+		"complete-payment-within": "Please complete payment within {timeLeft}"
+	},
 	"Class": {
 		"class": "",
 		"completition": "",

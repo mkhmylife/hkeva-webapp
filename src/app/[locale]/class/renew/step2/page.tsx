@@ -7,7 +7,6 @@ import CourseCalendar from "@/components/course-calendar";
 import React from "react";
 import {Link} from "@/i18n/navigation";
 import BackButton from "@/components/back-button";
-import CourseRenewHolidayPicker from "@/components/course-renew-holiday-picker";
 
 type Props = {
   params: Promise<{
@@ -96,11 +95,25 @@ export default async function CourseDetailPage(props: Props) {
 
         <hr className="text-brand-neutral-200 my-5"/>
 
-        <CourseRenewHolidayPicker
+        <CourseCalendar
           course={course}
-          fromCourseId={fromCourseId}
-          isFull={!status.canEnroll}
         />
+
+          {!status.canEnroll ? (
+            <button
+              disabled
+              className="block opacity-50 text-center mt-4 w-full bg-primary text-white font-semibold py-2.5 px-4 rounded-[12px] transition-colors"
+            >
+              {t('CourseRenew.is-full')}
+            </button>
+          ) : (
+            <Link
+              href={`/class/renew/step3?fromCourseId=${fromCourseId}&toCourseId=${toCourseId}`}
+              className="block text-center mt-4 w-full bg-primary text-white font-semibold py-2.5 px-4 rounded-[12px] transition-colors"
+            >
+              {t('CourseRenew.next-step')}
+            </Link>
+          )}
       </div>
     </div>
   );

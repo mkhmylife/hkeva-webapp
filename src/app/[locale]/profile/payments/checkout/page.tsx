@@ -7,6 +7,7 @@ import {getInvoice} from "@/libs/invoice";
 import {notFound} from "next/navigation";
 import {getEnrolledCourse, getEnrollmentDeductible} from "@/libs/course";
 import Checkout from "@/components/checkout";
+import InvoiceCountdown from "@/components/invoice-countdown";
 
 type IProps = {
   searchParams: Promise<{
@@ -42,12 +43,18 @@ export default async function PaymentCheckoutPage(props: IProps) {
 
       <div className="mt-3">
         <CourseCardLarge course={course}>
+
           <hr className="text-brand-neutral-200"/>
+
           <Checkout
             course={course}
             invoice={invoice}
             deductibles={deductibles}
           />
+
+          <div className="mt-4">
+            <InvoiceCountdown updatedAt={invoice.updatedAt} />
+          </div>
         </CourseCardLarge>
       </div>
     </div>

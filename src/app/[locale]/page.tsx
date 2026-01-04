@@ -25,10 +25,12 @@ export default async function Home(props: Props) {
   const t = await getTranslations();
 
   const selectedDate = date ? moment(date).toDate() : moment();
-  const enrollments = await getEnrollments();
-  const todayEnrollments = await getEnrollments(selectedDate.toISOString());
 
-  const toDos = await getToDos();
+  const [enrollments, todayEnrollments, toDos] = await Promise.all([
+    getEnrollments(),
+    getEnrollments(selectedDate.toISOString()),
+    getToDos()
+  ]);
 
   return (
     <div className="container px-4 sm:px-6 lg:px-8 pb-10">

@@ -10,6 +10,7 @@ import {Pencil} from "lucide-react";
 import {applyPointsInInvoice, payInvoice, unapplyPointsInInvoice} from "@/libs/invoice";
 import {useRouter} from "@/i18n/navigation";
 import {getEnrollmentDeductible} from "@/libs/course";
+import moment from "moment";
 
 type IProps = {
   course: CourseDto;
@@ -54,6 +55,11 @@ export default function Checkout(props: IProps) {
     }
     return availablePoints;
   }, [deductibles, invoice.total]);
+
+  const isExpired = useMemo(() => {
+    const expiryTime = moment(invoice.updatedAt).add(15, 'minutes');
+    return moment().isAfter(expiryTime);
+  }, [invoice.updatedAt]);
 
   const applyPoints = useCallback(async () => {
     setIsLoading(true);
@@ -175,8 +181,16 @@ export default function Checkout(props: IProps) {
         <div className="text-right font-semibold text-2xl">HK${invoice.total.toLocaleString()}</div>
       </div>
 
-      <button type="submit" className="cursor-pointer w-full bg-brand-500 text-white rounded-xl py-2 px-6 mt-4 block text-center font-medium">
-        {t('ProfilePayments.pay-now')}
+      <button
+        type="submit"
+        disabled={isExpired}
+        className={`w-full rounded-xl py-2 px-6 mt-4 block text-center font-medium ${
+          isExpired
+            ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+            : 'bg-brand-500 text-white cursor-pointer'
+        }`}
+      >
+        {isExpired ? t('InvoiceCountdown.expired') : t('ProfilePayments.pay-now')}
       </button>
 
       {isLoading ? (

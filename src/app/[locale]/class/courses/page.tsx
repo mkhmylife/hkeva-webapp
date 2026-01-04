@@ -2,11 +2,11 @@ import {Link} from "@/i18n/navigation";
 import {getTranslations} from "next-intl/server";
 import {getCourses} from "@/libs/course";
 import CourseCard from "@/components/course-card";
-import {getMe} from "@/libs/user";
 import BackButton from "@/components/back-button";
 import {ChevronLeft} from "lucide-react";
 import React from "react";
 import CourseFilterButton from "@/components/course-filter-button";
+import {getMe} from "@/libs/user";
 
 type Props = {
   params: Promise<{
@@ -17,23 +17,30 @@ type Props = {
     level?: string;
     age?: string;
     day?: string;
+    category?: string;
   }>;
 }
 
 export default async function CoursesPage(props: Props) {
 
-  const { age, level, area, day } = await props.searchParams;
+  const { age, level, area, day, category } = await props.searchParams;
 
   const t = await getTranslations();
 
-  const [courses] = await Promise.all([
+  const [courses, me] = await Promise.all([
     getCourses({
       age: age || undefined,
       level: level || undefined,
       area: area || undefined,
       day: day || undefined,
+      category: category || undefined,
     }),
+    getMe(),
   ]);
+
+  const canEnrollCourse = courses.filter(c => c.category2 && me.category && c.category2?.order <= me.category?.order);
+  const cannotEnrollCourse = courses.filter(c => !c.category2 || (me.category && c.category2?.order > me.category?.order));
+  const sortedCourses = [...canEnrollCourse, ...cannotEnrollCourse];
 
   return (
     <div className="container px-4 sm:px-6 lg:px-8">
@@ -42,7 +49,9 @@ export default async function CoursesPage(props: Props) {
           <div className="rounded-full border border-brand-neutral-300 w-[24px] h-[24px] flex items-center justify-center shadow cursor-pointer block">
             <ChevronLeft className="text-brand-neutral-900 size-5" strokeWidth={1.2} />
           </div>
-          <h1 className="text-lg font-semibold">{t('Course.title')}</h1>
+          <h1 className="text-lg font-semibold">
+            {!category ? t('Course.title') : category}
+          </h1>
         </BackButton>
 
         <div className="flex items-center gap-4">
@@ -54,7 +63,7 @@ export default async function CoursesPage(props: Props) {
       </div>
 
       <div className="mt-4 space-y-4">
-        {courses.map((course) => (
+        {sortedCourses.map((course) => (
           <Link key={course.id} href={`/class/courses/${course.id}`} className="block">
             <CourseCard course={course} />
           </Link>

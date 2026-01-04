@@ -9,6 +9,7 @@ import {Link} from "@/i18n/navigation";
 import BackButton from "@/components/back-button";
 import CourseCardLarge from "@/components/course-card-large";
 import CourseEnrollButton from "@/components/course-enroll-button";
+import CourseRenewHolidayPicker from "@/components/course-renew-holiday-picker";
 
 type Props = {
   params: Promise<{
@@ -84,6 +85,11 @@ export default async function CourseDetailPage(props: Props) {
             </div>
           </CourseCardLarge>
         </div>
+
+        <CourseRenewHolidayPicker
+          course={course}
+          fromCourseId={fromCourseId}
+        />
 
         <CourseEnrollButton
           course={course}

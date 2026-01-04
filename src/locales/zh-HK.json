@@ -11,6 +11,10 @@
 		"use-points-to-save": "可扣減：HK${save}",
 		"used-points": "已用補堂面值"
 	},
+	"InvoiceCountdown": {
+		"expired": "此帳單已過期",
+		"complete-payment-within": "請於 {timeLeft} 內完成付款"
+	},
 	"Class": {
 		"class": "課程",
 		"completition": "比賽",

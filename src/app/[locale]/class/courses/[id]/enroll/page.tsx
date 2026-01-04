@@ -1,5 +1,5 @@
 import {getTranslations} from "next-intl/server";
-import {getCourse} from "@/libs/course";
+import {getCourse, getCourseEnrollmentStatus} from "@/libs/course";
 import {ChevronLeft} from "lucide-react";
 import {convertWeekdayToNumber} from "@/libs/weekday";
 import moment from "moment/moment";
@@ -7,6 +7,8 @@ import React from "react";
 import BackButton from "@/components/back-button";
 import CourseCardLarge from "@/components/course-card-large";
 import CourseEnrollButton from "@/components/course-enroll-button";
+import CourseHolidayPicker from "@/components/course-holiday-picker";
+import {getMe} from "@/libs/user";
 
 type Props = {
   params: Promise<{
@@ -25,7 +27,10 @@ export default async function CourseDetailPage(props: Props) {
 
   const { id: courseId } = await props.params;
   const { holiday1, holiday2 } = await props.searchParams;
-  const course = await getCourse(Number(courseId));
+  const [course, me] = await Promise.all([
+    getCourse(Number(courseId)),
+    getMe()
+  ]);
   const lessons = course.lessons;
   const firstLesson = lessons && lessons.length > 0 ? lessons[0] : null;
   const enrolledLessons = lessons?.filter((lesson) => {
@@ -82,6 +87,11 @@ export default async function CourseDetailPage(props: Props) {
             </div>
           </CourseCardLarge>
         </div>
+
+        <CourseHolidayPicker
+          course={course}
+          user={me}
+        />
 
         <CourseEnrollButton
           course={course}

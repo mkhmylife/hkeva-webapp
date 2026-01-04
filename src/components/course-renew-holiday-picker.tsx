@@ -2,10 +2,11 @@
 
 import {CourseDto} from "@/types/courseDto";
 import CourseCalendar from "@/components/course-calendar";
-import React, {useCallback, useMemo} from "react";
+import React, {useCallback, useMemo, useState} from "react";
 import {useTranslations} from "next-intl";
-import {Link} from "@/i18n/navigation";
+import {Link, useRouter} from "@/i18n/navigation";
 import moment from "moment";
+import {Dialog, DialogPanel} from "@headlessui/react";
 
 type IProps = {
   course: CourseDto;
@@ -15,9 +16,11 @@ type IProps = {
 
 export default function CourseRenewHolidayPicker(props: IProps) {
 
+  const router = useRouter();
   const t = useTranslations();
 
-  const [holidays, setHolidays] = React.useState<Date[]>([]);
+  const [holidays, setHolidays] = useState<Date[]>([]);
+  const [isOpen, setIsOpen] = useState(false);
 
   const onDatePicked = useCallback((date: Date) => {
     if (holidays.length >= 2) {
@@ -32,7 +35,7 @@ export default function CourseRenewHolidayPicker(props: IProps) {
     }
   }, [holidays, t]);
 
-  const nextUrl = useMemo(() => {
+  const apply = useCallback(() => {
     const sp = new URLSearchParams({
       fromCourseId: props.fromCourseId,
       toCourseId: props.course.id.toString(),
@@ -43,53 +46,71 @@ export default function CourseRenewHolidayPicker(props: IProps) {
     if (holidays.length === 2) {
       sp.append('holiday2', moment(holidays[1]).format('YYYY-MM-DD'));
     }
-    return `/class/renew/step3?${sp.toString()}`;
-  }, [holidays, props.fromCourseId, props.course.id]);
+    router.replace(`/class/renew/step3?${sp.toString()}`);
+    setIsOpen(false);
+  }, [props.fromCourseId, props.course.id, holidays, router]);
 
   return (
-    <div className="relative">
-      <h2 className="font-semibold text-sm mb-2">{t('Course.select-lessons-that-cant-join')}：</h2>
-      <div>
-        {holidays.length > 0 ? (
-          <div className="flex flex-wrap gap-2 mb-0">
-            {holidays.map((holiday, index) => (
-              <a
-                key={index}
-                onClick={() => {
-                  setHolidays(holidays.filter(h => h.getTime() !== holiday.getTime()));
-                }}
-                className="bg-red-100 text-red-600 text-xs px-2 py-1 rounded-full"
-              >
-                {holiday.toLocaleDateString()}
-              </a>
-            ))}
+    <>
+
+      <button onClick={() => setIsOpen(true)} className="block text-center mt-4 w-full border-primary border text-primary bg-white font-semibold py-2.5 px-4 rounded-[12px] transition-colors">
+        {t('Course.select-lessons-that-cant-join')}
+      </button>
+      <Dialog open={isOpen} as="div" className="relative z-10 focus:outline-none" onClose={close}>
+        <div className="fixed inset-0 bg-black/50 z-10 w-screen overflow-y-auto">
+          <div className="flex min-h-full items-center justify-center p-4">
+            <DialogPanel
+              transition
+              className="w-full max-w-md rounded-xl bg-white p-6 duration-300 ease-out data-closed:transform-[scale(95%)] data-closed:opacity-0"
+            >
+              <div className="relative">
+                <h2 className="font-semibold text-sm mb-2">{t('Course.select-lessons-that-cant-join')}：</h2>
+                <div>
+                  {holidays.length > 0 ? (
+                    <div className="flex flex-wrap gap-2 mb-0">
+                      {holidays.map((holiday, index) => (
+                        <a
+                          key={index}
+                          onClick={() => {
+                            setHolidays(holidays.filter(h => h.getTime() !== holiday.getTime()));
+                          }}
+                          className="bg-red-100 text-red-600 text-xs px-2 py-1 rounded-full"
+                        >
+                          {holiday.toLocaleDateString()}
+                        </a>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+                <CourseCalendar
+                  course={props.course}
+                  onChange={onDatePicked}
+                />
+
+                <button
+                  onClick={() => apply()}
+                  className="block text-center mt-4 w-full bg-primary text-white font-semibold py-2.5 px-4 rounded-[12px] transition-colors"
+                >
+                  {props.isFull ? (
+                    <>
+                      {t('CourseRenew.is-full')}
+                    </>
+                  ) : (
+                    <>
+                      {t('CourseRenew.next-step')}
+                    </>
+                  )}
+                </button>
+
+                {props.isFull ? (
+                  <div className="absolute bg-background/50 h-full w-full inset-0" />
+                ) : null}
+              </div>
+            </DialogPanel>
           </div>
-        ) : null}
-      </div>
-      <CourseCalendar
-        course={props.course}
-        onChange={onDatePicked}
-      />
-
-      <Link
-        href={nextUrl}
-        className="block text-center mt-4 w-full bg-primary text-white font-semibold py-2.5 px-4 rounded-[12px] transition-colors"
-      >
-        {props.isFull ? (
-          <>
-            {t('CourseRenew.is-full')}
-          </>
-        ) : (
-          <>
-            {t('CourseRenew.next-step')}
-          </>
-        )}
-      </Link>
-
-      {props.isFull ? (
-        <div className="absolute bg-background/50 h-full w-full inset-0" />
-      ) : null}
-    </div>
+        </div>
+      </Dialog>
+    </>
   )
 
 }

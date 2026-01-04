@@ -5,8 +5,9 @@ import {convertWeekdayToNumber} from "@/libs/weekday";
 import moment from "moment/moment";
 import React from "react";
 import BackButton from "@/components/back-button";
-import CourseHolidayPicker from "@/components/course-holiday-picker";
 import {getMe} from "@/libs/user";
+import {Link} from "@/i18n/navigation";
+import CourseCalendar from "@/components/course-calendar";
 
 type Props = {
   params: Promise<{
@@ -29,6 +30,13 @@ export default async function CourseDetailPage(props: Props) {
 
   const lessons = course.lessons;
   const firstLesson = lessons && lessons.length > 0 ? lessons[0] : null;
+
+  const canUserEnroll = () => {
+    if (me.category) {
+      return me.category.order >= (course.category2?.order || 0);
+    }
+    return true;
+  }
 
   return (
     <div className="relative">
@@ -94,11 +102,31 @@ export default async function CourseDetailPage(props: Props) {
 
         <hr className="text-brand-neutral-200 my-5"/>
 
-        <CourseHolidayPicker
+        <CourseCalendar
           course={course}
-          user={me}
-          isFull={!status.canEnroll}
         />
+
+          {canUserEnroll() ? (
+            <>
+              {!status.canEnroll ? (
+                <button disabled className="opacity-50 block text-center mt-4 w-full bg-primary text-white font-semibold py-2.5 px-4 rounded-[12px] transition-colors">
+                  {t('CourseRenew.is-full')}
+                </button>
+              ) : (
+                <Link
+                  href={`/class/courses/${course.id}/enroll`}
+                  className="block text-center mt-4 w-full bg-primary text-white font-semibold py-2.5 px-4 rounded-[12px] transition-colors"
+                >
+                  {t('CourseRenew.next-step')}
+                </Link>
+              )}
+            </>
+          ) : (
+            <button disabled className="opacity-50 block text-center mt-4 w-full bg-primary text-white font-semibold py-2.5 px-4 rounded-[12px] transition-colors">
+              {t('CourseRenew.grade-too-low-to-enroll')}
+            </button>
+          )}
+
       </div>
     </div>
   );
