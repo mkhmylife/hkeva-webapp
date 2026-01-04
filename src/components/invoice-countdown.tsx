@@ -10,7 +10,7 @@ type Props = {
 }
 
 export default function InvoiceCountdown(props: Props) {
-  const { updatedAt, minutes = 15 } = props;
+  const { updatedAt, minutes = 10 } = props;
   const [timeLeft, setTimeLeft] = useState<string>('');
   const [isExpired, setIsExpired] = useState(false);
   const t = useTranslations('InvoiceCountdown');

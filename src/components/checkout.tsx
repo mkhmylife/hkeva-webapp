@@ -5,7 +5,7 @@ import {useTranslations} from "next-intl";
 import {CourseDto} from "@/types/courseDto";
 import {InvoiceDto} from "@/types/invoiceDto";
 import {EnrollmentDto, LessonEnrollmentStatus} from "@/types/enrollment";
-import {useCallback, useMemo, useState} from "react";
+import {useCallback, useEffect, useMemo, useState} from "react";
 import {Pencil} from "lucide-react";
 import {applyPointsInInvoice, payInvoice, unapplyPointsInInvoice} from "@/libs/invoice";
 import {useRouter} from "@/i18n/navigation";
@@ -32,6 +32,16 @@ export default function Checkout(props: IProps) {
   const [invoice, setInvoice] = useState<InvoiceDto>(props.invoice);
   const [deductibles, setDeductibles] = useState<EnrollmentDto[]>(props.deductibles);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [currentTime, setCurrentTime] = useState<number>(Date.now());
+
+  // Update current time every second to trigger isExpired recalculation
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(Date.now());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
 
   const usedPoints = useMemo(() => {
     let total = 0;
@@ -57,9 +67,9 @@ export default function Checkout(props: IProps) {
   }, [deductibles, invoice.total]);
 
   const isExpired = useMemo(() => {
-    const expiryTime = moment(invoice.updatedAt).add(15, 'minutes');
-    return moment().isAfter(expiryTime);
-  }, [invoice.updatedAt]);
+    const expiryTime = moment(invoice.updatedAt).add(10, 'minutes');
+    return moment(currentTime).isAfter(expiryTime);
+  }, [invoice.updatedAt, currentTime]);
 
   const applyPoints = useCallback(async () => {
     setIsLoading(true);
