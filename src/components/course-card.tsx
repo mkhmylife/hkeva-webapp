@@ -25,8 +25,8 @@ export default function CourseCard(props: Props) {
       <div className="w-full">
         <div className="mb-1.5 flex justify-between items-center gap-1">
           <h2 className="font-semibold line-clamp-1">{course.name}</h2>
-          <div className="text-sm text-brand-neutral-500 whitespace-pre">
-            {course.category2?.name}
+          <div className="text-xs text-brand-neutral-500 whitespace-pre">
+            {course.category?.name}{course.category2?.name}
             {firstLessson ? (
               <>
                 {" · "}{course.lessons?.length}節

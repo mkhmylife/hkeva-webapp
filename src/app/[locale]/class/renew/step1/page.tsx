@@ -35,6 +35,24 @@ export default async function CourseRenewPage(props: Props) {
     area: area || undefined,
     day: day || undefined,
   });
+  const canEnrollCourse = courses.filter(c => {
+    if (!me.category || !c.category2) {
+      return false;
+    }
+    if (me.category.order >= 100) {
+      return c.category2 && c.category2.order <= me.category.order && c.category2.order >= 100;
+    }
+    return c.category2 && c.category2.order <= me.category.order;
+  });
+  const cannotEnrollCourse = courses.filter(c => {
+    if (!me.category || !c.category2) {
+      return false;
+    }
+    if (me.category && me.category.order >= 100) {
+      return !c.category2 || (c.category2.order > me.category.order || c.category2.order < 100);
+    }
+    return !c.category2 || (c.category2.order > me.category.order);
+  });
 
   return (
     <div className="container px-4 sm:px-6 lg:px-8">
@@ -63,8 +81,13 @@ export default async function CourseRenewPage(props: Props) {
 
       <h2 className="mt-4 font-semibold text-lg">{t('CourseRenew.select-course')}</h2>
       <div className="space-y-3 my-3">
-        {courses.filter(c => c.id.toString() !== fromCourseId).map(course => (
+        {canEnrollCourse.filter(c => c.id.toString() !== fromCourseId).map(course => (
           <Link key={course.id} href={`/class/renew/step2?fromCourseId=${fromCourseId}&toCourseId=${course.id}`} className="block">
+            <CourseCard course={course} />
+          </Link>
+        ))}
+        {cannotEnrollCourse.filter(c => c.id.toString() !== fromCourseId).map(course => (
+          <Link key={course.id} href={`/class/renew/step2?fromCourseId=${fromCourseId}&toCourseId=${course.id}`} className="block opacity-50">
             <CourseCard course={course} />
           </Link>
         ))}

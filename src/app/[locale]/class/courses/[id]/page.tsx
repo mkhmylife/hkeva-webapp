@@ -32,10 +32,13 @@ export default async function CourseDetailPage(props: Props) {
   const firstLesson = lessons && lessons.length > 0 ? lessons[0] : null;
 
   const canUserEnroll = () => {
-    if (me.category) {
-      return me.category.order >= (course.category2?.order || 0);
+    if (!me.category || !course.category2) {
+      return false;
     }
-    return true;
+    if (me.category.order >= 100) {
+      return me.category.order >= course.category2.order && course.category2.order >= 100;
+    }
+    return me.category.order >= course.category2.order;
   }
 
   return (

@@ -38,9 +38,24 @@ export default async function CoursesPage(props: Props) {
     getMe(),
   ]);
 
-  const canEnrollCourse = courses.filter(c => c.category2 && me.category && c.category2?.order <= me.category?.order);
-  const cannotEnrollCourse = courses.filter(c => !c.category2 || (me.category && c.category2?.order > me.category?.order));
-  const sortedCourses = [...canEnrollCourse, ...cannotEnrollCourse];
+  const canEnrollCourse = courses.filter(c => {
+    if (!me.category || !c.category2) {
+      return false;
+    }
+    if (me.category.order >= 100) {
+      return c.category2 && c.category2.order <= me.category.order && c.category2.order >= 100;
+    }
+    return c.category2 && c.category2.order <= me.category.order;
+  });
+  const cannotEnrollCourse = courses.filter(c => {
+    if (!me.category || !c.category2) {
+      return false;
+    }
+    if (me.category && me.category.order >= 100) {
+      return !c.category2 || (c.category2.order > me.category.order || c.category2.order < 100);
+    }
+    return !c.category2 || (c.category2.order > me.category.order);
+  });
 
   return (
     <div className="container px-4 sm:px-6 lg:px-8">
@@ -63,8 +78,13 @@ export default async function CoursesPage(props: Props) {
       </div>
 
       <div className="mt-4 space-y-4">
-        {sortedCourses.map((course) => (
+        {canEnrollCourse.map((course) => (
           <Link key={course.id} href={`/class/courses/${course.id}`} className="block">
+            <CourseCard course={course} />
+          </Link>
+        ))}
+        {cannotEnrollCourse.map((course) => (
+          <Link key={course.id} href={`/class/courses/${course.id}`} className="block opacity-50">
             <CourseCard course={course} />
           </Link>
         ))}

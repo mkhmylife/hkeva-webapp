@@ -7,6 +7,7 @@ import CourseCalendar from "@/components/course-calendar";
 import React from "react";
 import {Link} from "@/i18n/navigation";
 import BackButton from "@/components/back-button";
+import {getMe} from "@/libs/user";
 
 type Props = {
   params: Promise<{
@@ -23,10 +24,20 @@ export default async function CourseDetailPage(props: Props) {
   const t = await getTranslations();
 
   const { fromCourseId, toCourseId } = await props.searchParams;
-  const [course, status] = await Promise.all([
+  const [course, status, me] = await Promise.all([
     getCourse(Number(toCourseId)),
     getCourseEnrollmentStatus(Number(toCourseId)),
+    getMe()
   ]);
+  const canUserEnroll = () => {
+    if (!status.canEnroll || !me.category || !course.category2) {
+      return false;
+    }
+    if (me.category.order >= 100) {
+      return me.category.order >= course.category2.order && course.category2.order >= 100;
+    }
+    return me.category.order >= course.category2.order;
+  }
 
   const lessons = course.lessons;
   const firstLesson = lessons && lessons.length > 0 ? lessons[0] : null;
@@ -99,21 +110,32 @@ export default async function CourseDetailPage(props: Props) {
           course={course}
         />
 
-          {!status.canEnroll ? (
-            <button
-              disabled
-              className="block opacity-50 text-center mt-4 w-full bg-primary text-white font-semibold py-2.5 px-4 rounded-[12px] transition-colors"
-            >
-              {t('CourseRenew.is-full')}
-            </button>
-          ) : (
-            <Link
-              href={`/class/renew/step3?fromCourseId=${fromCourseId}&toCourseId=${toCourseId}`}
-              className="block text-center mt-4 w-full bg-primary text-white font-semibold py-2.5 px-4 rounded-[12px] transition-colors"
-            >
-              {t('CourseRenew.next-step')}
-            </Link>
-          )}
+        {!canUserEnroll() ? (
+          <>
+            {!status.canEnroll ? (
+              <button
+                disabled
+                className="block opacity-50 text-center mt-4 w-full bg-primary text-white font-semibold py-2.5 px-4 rounded-[12px] transition-colors"
+              >
+                {t('CourseRenew.is-full')}
+              </button>
+            ) : (
+              <button
+                disabled
+                className="block opacity-50 text-center mt-4 w-full bg-primary text-white font-semibold py-2.5 px-4 rounded-[12px] transition-colors"
+              >
+                {t('CourseRenew.grade-too-low-to-enroll')}
+              </button>
+            )}
+          </>
+        ) : (
+          <Link
+            href={`/class/renew/step3?fromCourseId=${fromCourseId}&toCourseId=${toCourseId}`}
+            className="block text-center mt-4 w-full bg-primary text-white font-semibold py-2.5 px-4 rounded-[12px] transition-colors"
+          >
+            {t('CourseRenew.next-step')}
+          </Link>
+        )}
       </div>
     </div>
   );
