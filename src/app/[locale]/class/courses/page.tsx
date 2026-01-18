@@ -7,6 +7,8 @@ import {ChevronLeft} from "lucide-react";
 import React from "react";
 import CourseFilterButton from "@/components/course-filter-button";
 import {getMe} from "@/libs/user";
+import Card from "@/components/card";
+import {Volleyball} from "lucide-react";
 
 type Props = {
   params: Promise<{
@@ -18,12 +20,13 @@ type Props = {
     age?: string;
     day?: string;
     category?: string;
+    code?: string;
   }>;
 }
 
 export default async function CoursesPage(props: Props) {
 
-  const { age, level, area, day, category } = await props.searchParams;
+  const { age, level, area, day, category, code } = await props.searchParams;
 
   const t = await getTranslations();
 
@@ -34,6 +37,7 @@ export default async function CoursesPage(props: Props) {
       area: area || undefined,
       day: day || undefined,
       category: category || undefined,
+      code: code || undefined,
     }),
     getMe(),
   ]);
@@ -73,21 +77,33 @@ export default async function CoursesPage(props: Props) {
           {/*<div className="text-sm bg-primary-100 text-brand-neutral-900 py-1 px-2.5 rounded-full whitespace-pre">*/}
           {/*  {me.level}*/}
           {/*</div>*/}
-          <CourseFilterButton initialValues={{ age, area, day, level }} />
+          <CourseFilterButton initialValues={{ age, area, day, level, code }} />
         </div>
       </div>
 
       <div className="mt-4 space-y-4">
-        {canEnrollCourse.map((course) => (
-          <Link key={course.id} href={`/class/courses/${course.id}`} className="block">
-            <CourseCard course={course} />
-          </Link>
-        ))}
-        {cannotEnrollCourse.map((course) => (
-          <Link key={course.id} href={`/class/courses/${course.id}`} className="block opacity-50">
-            <CourseCard course={course} />
-          </Link>
-        ))}
+        {courses.length === 0 ? (
+          <Card className="h-[300px] flex flex-col justify-center items-center">
+            <div className="w-[80px] h-[80px] bg-primary/10 rounded-full flex items-center justify-center mb-4">
+              <Volleyball className="w-[40px] h-[40px] text-primary"/>
+            </div>
+            <p className="font-semibold text-xl text-brand-neutral-900">{t('Course.no-courses')}</p>
+            <p className="text-sm text-brand-neutral-500 mt-2">{t('Course.no-courses-description')}</p>
+          </Card>
+        ) : (
+          <>
+            {canEnrollCourse.map((course) => (
+              <Link key={course.id} href={`/class/courses/${course.id}`} className="block">
+                <CourseCard course={course} />
+              </Link>
+            ))}
+            {cannotEnrollCourse.map((course) => (
+              <Link key={course.id} href={`/class/courses/${course.id}`} className="block opacity-50">
+                <CourseCard course={course} />
+              </Link>
+            ))}
+          </>
+        )}
       </div>
     </div>
   );

@@ -26,6 +26,8 @@
 		"confirm-enrollment": "",
 		"fixed-room": "",
 		"go-to-checkout": "",
+		"no-courses": "No Courses",
+		"no-courses-description": "No courses match your criteria. Please try adjusting the filters.",
 		"not-fixed-room": "",
 		"paid-at": "",
 		"select-lessons-that-cant-join": "",
@@ -35,6 +37,9 @@
 		"age": "",
 		"apply-filter": "",
 		"area": "",
+		"clear-all": "Clear All",
+		"code": "Course Code",
+		"code-placeholder": "Enter course code",
 		"day": "",
 		"level": "",
 		"title": ""
@@ -108,6 +113,8 @@
 		"password": "",
 		"phoneNumber": "",
 		"please-fill-in-all-required-fields": "",
+		"pick-student": "Select Student Account",
+		"student-id": "Student ID",
 		"title": ""
 	},
 	"News": {
@@ -126,6 +133,8 @@
 		"clothes-size-change-confirm": "",
 		"my-lessons": "",
 		"payment": "",
+		"select-student": "Select Student",
+		"switch-student-confirm": "Switch to {name}'s account?",
 		"timetable": "",
 		"title": "",
 		"upload-pic": "Upload Profile Pic",

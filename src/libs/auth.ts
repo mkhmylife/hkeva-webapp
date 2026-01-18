@@ -53,6 +53,27 @@ export const register = async (payload: {
   await createSession(accessToken);
 }
 
+export const loginPickStudents = async (payload: {
+  phoneNumber: string;
+  password: string;
+}) => {
+  const res = await fetch(`${process.env.API_URL || process.env.NEXT_PUBLIC_API_URL}/auth/student/login-pick-students`, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+  if (!res.ok) {
+    throw new Error(res.statusText);
+  }
+  return await res.json() as { name: string; id: number; accessToken: string; code: string }[];
+}
+
+export const loginWithStudentToken = async (accessToken: string) => {
+  await createSession(accessToken);
+}
+
 export const login = async (payload: {
   phoneNumber: string;
   password: string;
@@ -71,6 +92,14 @@ export const login = async (payload: {
   console.log(accessToken);
   await createSession(accessToken);
   // return { accessToken, refreshToken }
+}
+
+export const getStudents = async () => {
+  const res = await fetcher('POST', `/auth/student/pick-students`);
+  if (!res.ok) {
+    throw new Error(res.statusText);
+  }
+  return await res.json() as { name: string; id: number; accessToken: string; code: string }[];
 }
 
 export const logout = async () => {

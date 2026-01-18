@@ -13,6 +13,7 @@ export const getCourses = async (query?: {
   age?: string | string[];
   day?: string | string[];
   category?: string;
+  code?: string;
 }) => {
   const sp = new URLSearchParams();
   if (query) {
@@ -46,6 +47,9 @@ export const getCourses = async (query?: {
       } else {
         sp.append('day', query.day);
       }
+    }
+    if (query.code) {
+      sp.append('code', query.code);
     }
   }
   const res = await fetcher('GET', `/app/course?${sp.toString()}`);

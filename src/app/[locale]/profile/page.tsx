@@ -6,17 +6,25 @@ import {getEnrollments} from "@/libs/course";
 import EnrollmentCard from "@/components/enrollment-card";
 import {Link} from "@/i18n/navigation";
 import React from "react";
+import {getStudents} from "@/libs/auth";
+import StudentSwitcher from "@/components/student-switcher";
 
 export default async function ProfilePage() {
 
   const t = await getTranslations();
 
-  const me = await getMe();
-  const enrollments = await getEnrollments();
+  const [me, enrollments, students] = await Promise.all([
+    getMe(),
+    getEnrollments(),
+    getStudents()
+  ]);
 
   return (
     <div className="container px-4 sm:px-6 lg:px-8 pb-10">
-      <h1 className="font-semibold text-md">{t('Profile.title')}</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="font-semibold text-md">{t('Profile.title')}</h1>
+        <StudentSwitcher currentUserId={me.id} students={students} />
+      </div>
 
       <div className="flex gap-5 mt-5">
         <div className="bg-primary-100 aspect-square rounded-full w-[69px] h-[69px] flex items-center justify-center">
