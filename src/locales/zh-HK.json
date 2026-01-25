@@ -131,6 +131,7 @@
 	"Profile": {
 		"clothes-size": "球衣碼數",
 		"clothes-size-change-confirm": "你確定你的球衣碼數是 {size}？",
+		"edit-profile": "編輯資料",
 		"my-lessons": "我的課堂",
 		"payment": "付款",
 		"select-student": "選擇學生",

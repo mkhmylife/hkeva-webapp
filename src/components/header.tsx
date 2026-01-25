@@ -1,8 +1,8 @@
 'use client';
 
 import Image from "next/image";
-import {Settings} from "lucide-react";
 import {Link, usePathname} from "@/i18n/navigation";
+import SettingsMenu from "@/components/settings-menu";
 
 export default function Header() {
 
@@ -20,9 +20,7 @@ export default function Header() {
         />
       </Link>
       {!pathname.includes('auth') ? (
-        <Link href="/settings">
-          <Settings className="size-6" />
-        </Link>
+        <SettingsMenu />
       ) : null }
     </div>
   )

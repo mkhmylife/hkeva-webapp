@@ -1,5 +1,5 @@
 import {getTranslations} from "next-intl/server";
-import {CalendarCheck, User} from "lucide-react";
+import {CalendarCheck, User, Settings} from "lucide-react";
 import {getMe} from "@/libs/user";
 import Card from "@/components/card";
 import {getEnrollments} from "@/libs/course";
@@ -49,6 +49,15 @@ export default async function ProfilePage() {
           <p className="mt-0.5 flex gap-3 text-xs text-brand-neutral-500">{me.code}</p>
         </div>
       </div>
+
+      <Link href="/profile/settings" className="block mt-4">
+        <Card className="flex gap-2 items-center py-2 px-3">
+          <div className="w-[32px] h-[32px] flex items-center justify-center bg-brand-neutral-100 rounded-full">
+            <Settings className="w-[16px] h-[16px] text-primary-500"/>
+          </div>
+          <p className="font-medium text-sm">{t('Profile.edit-profile')}</p>
+        </Card>
+      </Link>
 
       <div className="mt-6 grid grid-cols-2 gap-3">
         <Link href="/profile/timetable">
