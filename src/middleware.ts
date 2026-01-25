@@ -8,7 +8,7 @@ import {decrypt} from "@/libs/session";
 
 const locales = ['zh-HK', 'en-HK'];
 
-const protectedRoutes = ['/', '/enrollment', '/profile', '/profile/settings', '/notification', "/settings"];
+const protectedRoutes = ['/', '/class', '/enrollment', '/profile', '/notification', '/settings'];
 const publicRoutes = ['/auth/login', '/auth/register', '/auth/forgot-password'];
 
 export default async function proxy(req: NextRequest) {
@@ -27,8 +27,8 @@ export default async function proxy(req: NextRequest) {
     return NextResponse.redirect(new URL(`/zh-HK/${path}`, req.nextUrl));
   }
 
-  const isProtectedRoute = protectedRoutes.includes(path);
-  const isPublicRoute = publicRoutes.includes(path);
+  const isProtectedRoute = protectedRoutes.some(route => path === route || path.startsWith(route + '/'));
+  const isPublicRoute = publicRoutes.some(route => path === route || path.startsWith(route + '/'));
 
   // 3. Decrypt the session from the cookie
   const cookie = (await cookies()).get('session')?.value
