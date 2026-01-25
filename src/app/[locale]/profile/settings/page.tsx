@@ -1,11 +1,11 @@
 import {getTranslations} from "next-intl/server";
-import {ChevronLeft, Shirt, User} from "lucide-react";
+import {ChevronLeft, User} from "lucide-react";
 import {getMe} from "@/libs/user";
-import Card from "@/components/card";
 import BackButton from '@/components/back-button';
 import React from "react";
 import ProfilePicUploader from '@/components/profile-pic-uploader';
 import ProfileClothesSizePicker from "@/components/profile-clothes-size-picker";
+import ProfilePasswordUpdater from "@/components/profile-password-updater";
 
 export default async function ProfilePage() {
 
@@ -50,6 +50,7 @@ export default async function ProfilePage() {
       <div className="mt-6 space-y-3 font-medium">
         <ProfilePicUploader label={t('Profile.upload-pic')} className="flex gap-3 items-center" />
         <ProfileClothesSizePicker />
+        <ProfilePasswordUpdater />
       </div>
 
     </div>

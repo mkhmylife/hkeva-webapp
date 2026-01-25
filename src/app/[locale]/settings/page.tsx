@@ -1,6 +1,6 @@
 import {getTranslations} from "next-intl/server";
 import BackButton from "@/components/back-button";
-import {ChevronLeft, ChevronRight, CircleQuestionMark, Globe, LogOut, User, Volleyball} from "lucide-react";
+import {ChevronLeft, ChevronRight, CircleQuestionMark, Globe, LogOut, User} from "lucide-react";
 import React from "react";
 import {Link} from "@/i18n/navigation";
 import Card from "@/components/card";

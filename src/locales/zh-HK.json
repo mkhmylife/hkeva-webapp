@@ -138,7 +138,14 @@
 		"timetable": "時間表",
 		"title": "我的帳戶",
 		"upload-pic": "上傳證件照",
-		"uploading-pic": "上傳中..."
+		"uploading-pic": "上傳中...",
+		"update-password": "更改密碼",
+		"current-password": "當前密碼",
+		"new-password": "新密碼",
+		"confirm-password": "確認密碼",
+		"password-updated": "密碼已成功更新",
+		"password-update-failed": "密碼更新失敗",
+		"passwords-do-not-match": "密碼不符"
 	},
 	"ProfilePayments": {
 		"deductible": "可扣減金額",

@@ -151,3 +151,13 @@ export const resetPassword = async (payload: {
     throw new Error(res.statusText);
   }
 }
+
+export const updatePassword = async (payload: {
+  password: string;
+}) => {
+  const res = await fetcher('POST', `/auth/student/update-password`, payload);
+  if (!res.ok) {
+    const {message} = await res.json()
+    throw new Error(message || res.statusText);
+  }
+}

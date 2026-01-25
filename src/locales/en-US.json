@@ -138,7 +138,14 @@
 		"timetable": "",
 		"title": "",
 		"upload-pic": "Upload Profile Pic",
-		"uploading-pic": "Uploading..."
+		"uploading-pic": "Uploading...",
+		"update-password": "Update Password",
+		"current-password": "Current Password",
+		"new-password": "New Password",
+		"confirm-password": "Confirm Password",
+		"password-updated": "Password updated successfully",
+		"password-update-failed": "Failed to update password",
+		"passwords-do-not-match": "Passwords do not match"
 	},
 	"ProfilePayments": {
 		"deductible": "",

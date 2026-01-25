@@ -8,7 +8,7 @@ import {decrypt} from "@/libs/session";
 
 const locales = ['zh-HK', 'en-HK'];
 
-const protectedRoutes = ['/', '/enrollment', '/profile', '/notification', "/settings"];
+const protectedRoutes = ['/', '/enrollment', '/profile', '/profile/settings', '/notification', "/settings"];
 const publicRoutes = ['/auth/login', '/auth/register', '/auth/forgot-password'];
 
 export default async function proxy(req: NextRequest) {
