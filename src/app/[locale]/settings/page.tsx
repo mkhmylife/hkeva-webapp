@@ -20,7 +20,7 @@ export default async function SettingsPage() {
       </BackButton>
 
       <div className="mt-4 space-y-4">
-        <Link href="/profile/settings" className="block">
+        <Link href="/profile/settings">
           <Card className="flex gap-3 items-center">
             <div className="w-[40px] h-[40px] flex items-center justify-center bg-brand-netural-100 rounded-full">
               <User className="w-[24px] h-[24px] text-primary-500"/>
@@ -29,7 +29,7 @@ export default async function SettingsPage() {
             <ChevronRight strokeWidth={1.2} className="ml-auto -mr-1 text-brand-neutral-500 opacity-50 size-8" />
           </Card>
         </Link>
-        <Link href="/" className="block">
+        <Link href="/">
           <Card className="flex gap-3 items-center">
             <div className="w-[40px] h-[40px] flex items-center justify-center bg-brand-netural-100 rounded-full">
               <Globe className="w-[24px] h-[24px] text-primary-500"/>
@@ -38,7 +38,7 @@ export default async function SettingsPage() {
             <ChevronRight strokeWidth={1.2} className="ml-auto -mr-1 text-brand-neutral-500 opacity-50 size-8" />
           </Card>
         </Link>
-        <Link href="/" className="block">
+        <Link href="/">
           <Card className="flex gap-3 items-center">
             <div className="w-[40px] h-[40px] flex items-center justify-center bg-brand-netural-100 rounded-full">
               <CircleQuestionMark className="w-[24px] h-[24px] text-primary-500"/>
@@ -47,7 +47,7 @@ export default async function SettingsPage() {
             <ChevronRight strokeWidth={1.2} className="ml-auto -mr-1 text-brand-neutral-500 opacity-50 size-8" />
           </Card>
         </Link>
-        <Link href="/auth/logout" className="block">
+        <Link href="/auth/logout">
           <Card className="flex gap-3 items-center">
             <div className="w-[40px] h-[40px] flex items-center justify-center bg-brand-100 rounded-full">
               <LogOut className="w-[24px] h-[24px] text-brand-500"/>

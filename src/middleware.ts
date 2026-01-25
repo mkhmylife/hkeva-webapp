@@ -27,7 +27,10 @@ export default async function proxy(req: NextRequest) {
     return NextResponse.redirect(new URL(`/zh-HK/${path}`, req.nextUrl));
   }
 
-  const isProtectedRoute = protectedRoutes.some(route => path === route || path.startsWith(route + '/'));
+  const isProtectedRoute = protectedRoutes.some(route => {
+    if (route === '/') return path === '/';
+    return path === route || path.startsWith(route + '/');
+  });
   const isPublicRoute = publicRoutes.some(route => path === route || path.startsWith(route + '/'));
 
   // 3. Decrypt the session from the cookie
@@ -39,7 +42,7 @@ export default async function proxy(req: NextRequest) {
     return NextResponse.redirect(new URL(`/${activeLocale}/auth/login`, req.nextUrl))
   }
 
-  // 5. Redirect to /dashboard if the user is authenticated
+  // 5. Redirect to / if the user is authenticated
   if (
     isPublicRoute &&
     session?.userId &&
