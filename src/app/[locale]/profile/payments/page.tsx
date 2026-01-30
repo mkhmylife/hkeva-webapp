@@ -9,6 +9,7 @@ import CourseCardLarge from "@/components/course-card-large";
 import Card from "@/components/card";
 import EnrollmentHolidayStatusCard from "@/components/enrollment-holiday-status-card";
 import DeductibleCardsSwiper from "@/components/deductible-cards-swiper";
+import InvoiceCountdown from "@/components/invoice-countdown";
 
 type Props = {
   params: Promise<{
@@ -99,7 +100,7 @@ export default async function ProfileTimetablePage(props: Props) {
           ) : null}
           {pendingPaymentCourses.map(course => {
             return (
-              <Link key={course.invoiceItem.id} href={`/profile/payments/checkout?invoiceId=${course.invoiceItem.invoiceId}&courseId=${course.course.id}`}>
+              <Link key={course.invoiceItem.id} href={`/profile/payments/checkout?invoiceId=${course.invoiceItem.invoiceId}&courseId=${course.course.id}`} className="block">
                 <CourseCardLarge course={course.course}>
                   {course.invoiceItem ? (
                     <>
@@ -110,6 +111,12 @@ export default async function ProfileTimetablePage(props: Props) {
                       <a className="cursor-pointer w-full bg-primary-100 rounded-xl py-2 px-6 mt-4 block text-center font-medium">
                         {t('ProfilePayments.goto-payment')}
                       </a>
+                      <div className="mt-4">
+                        <InvoiceCountdown
+                          updatedAt={course.invoiceItem.updatedAt}
+                          invoiceSource={course.invoiceItem.invoiceSource}
+                        />
+                      </div>
                     </>
                   ) : null}
                 </CourseCardLarge>

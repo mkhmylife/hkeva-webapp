@@ -107,6 +107,7 @@ export interface InvoiceItemDto {
   invoiceDue: number;
   invoicePaid: number;
   invoiceTotal: number;
+  invoiceSource?: string;
   price: number;
   originalPrice: number;
   qty: number;

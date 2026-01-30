@@ -6,11 +6,12 @@ import { useTranslations } from 'next-intl';
 
 type Props = {
   updatedAt: string;
-  minutes?: number;
+  invoiceSource?: string;
 }
 
 export default function InvoiceCountdown(props: Props) {
-  const { updatedAt, minutes = 10 } = props;
+  const { updatedAt, invoiceSource } = props;
+  const minutes = invoiceSource === 'app' ? 10 : 60 * 24 * 2;
   const [timeLeft, setTimeLeft] = useState<string>('');
   const [isExpired, setIsExpired] = useState(false);
   const t = useTranslations('InvoiceCountdown');

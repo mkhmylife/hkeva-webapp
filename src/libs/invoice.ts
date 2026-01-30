@@ -32,8 +32,10 @@ export const unapplyPointsInInvoice = async (id: number) => {
   return await res.json() as InvoiceDto;
 }
 
-export const payInvoice = async (id: number) => {
-  const res = await fetcher('POST', `/app/invoice/${id}/pay`);
+export const payInvoice = async (id: number, isMock: boolean) => {
+  const res = await fetcher('POST', `/app/invoice/${id}/pay`, {
+    isMock,
+  });
   if (!res.ok) {
     throw new Error(res.statusText);
   }

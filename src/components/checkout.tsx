@@ -95,10 +95,10 @@ export default function Checkout(props: IProps) {
     }
   }, [invoice.id, setValue]);
 
-  const checkout = useCallback(async (data: FormData) => {
+  const checkout = useCallback(async (isMock: boolean) => {
     setIsLoading(true);
     try {
-      const { paymentUrl } = await payInvoice(props.invoice.id);
+      const { paymentUrl } = await payInvoice(props.invoice.id, isMock);
       if (paymentUrl) {
         // ToDo: Redirect to payment URL
         window.location.href = paymentUrl;
@@ -113,7 +113,7 @@ export default function Checkout(props: IProps) {
   }, [props.invoice.id, router]);
 
   return (
-    <form onSubmit={handleSubmit(checkout)}>
+    <div>
 
       <div className="pt-4 text-right flex justify-end items-baseline">
         <div className="text-sm">{t('Checkout.subtotal')}</div>
@@ -192,7 +192,7 @@ export default function Checkout(props: IProps) {
       </div>
 
       <button
-        type="submit"
+        onClick={() => checkout(false)}
         disabled={isExpired}
         className={`w-full rounded-xl py-2 px-6 mt-4 block text-center font-medium ${
           isExpired
@@ -202,6 +202,20 @@ export default function Checkout(props: IProps) {
       >
         {isExpired ? t('InvoiceCountdown.expired') : t('ProfilePayments.pay-now')}
       </button>
+
+      {process.env.NEXT_PUBLIC_IS_BETA === "1" ? (
+        <button
+          onClick={() => checkout(true)}
+          disabled={isExpired}
+          className={`w-full rounded-xl py-2 px-6 mt-2 block text-center font-medium ${
+            isExpired
+              ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+              : 'bg-black text-white cursor-pointer'
+          }`}
+        >
+          {isExpired ? t('InvoiceCountdown.expired') : 'Mock Payment'}
+        </button>
+      ) : null}
 
       {isLoading ? (
         <div className="bg-white/50 fixed inset-0 flex justify-center items-center">
@@ -218,7 +232,7 @@ export default function Checkout(props: IProps) {
           </div>
         </div>
       ) : null}
-    </form>
+    </div>
   )
 
 }
