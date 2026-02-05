@@ -89,12 +89,14 @@ export interface InvoiceDto {
   due: number;
   bbmslId?: string;
   bbmslUrl?: string;
+  stripeUrl?: string;
   promoCode?: {
     id: number;
     code: string;
     name: string;
   };
   updatedAt: string;
+  source?: string;
 }
 
 export interface InvoiceItemDto {

@@ -96,6 +96,9 @@ export default function Checkout(props: IProps) {
   }, [invoice.id, setValue]);
 
   const checkout = useCallback(async (isMock: boolean) => {
+    if (props.invoice.stripeUrl) {
+      window.location.href = props.invoice.stripeUrl;
+    }
     setIsLoading(true);
     try {
       const { paymentUrl } = await payInvoice(props.invoice.id, isMock);

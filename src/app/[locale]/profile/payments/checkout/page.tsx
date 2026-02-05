@@ -53,7 +53,10 @@ export default async function PaymentCheckoutPage(props: IProps) {
           />
 
           <div className="mt-4">
-            <InvoiceCountdown updatedAt={invoice.updatedAt} />
+            <InvoiceCountdown
+              updatedAt={invoice.updatedAt}
+              invoiceSource={invoice.source}
+            />
           </div>
         </CourseCardLarge>
       </div>
