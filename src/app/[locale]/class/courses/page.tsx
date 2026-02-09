@@ -53,7 +53,7 @@ export default async function CoursesPage(props: Props) {
       return false;
     }
     if (me.category.order >= 100) {
-      return categoryOrder <= me.category.order && categoryOrder >= 100;
+      return me.category.order >= categoryOrder && (categoryOrder >= 100 || categoryOrder < 10);
     }
     return categoryOrder <= me.category.order;
   });

@@ -119,7 +119,9 @@
 		"title": "登入"
 	},
 	"News": {
-		"title": "最新消息"
+		"title": "最新消息",
+		"no-news": "暫無消息",
+		"no-news-description": "暫時沒有最新消息"
 	},
 	"Notification": {
 		"last-week": "過往",
@@ -127,7 +129,9 @@
 		"this-week": "本週",
 		"title": "通知",
 		"today": "今天",
-		"yesterday": "昨天"
+		"yesterday": "昨天",
+		"no-notifications": "暫無通知",
+		"no-notifications-description": "你暫時沒有任何通知"
 	},
 	"Profile": {
 		"clothes-size": "球衣碼數",

@@ -119,7 +119,9 @@
 		"title": ""
 	},
 	"News": {
-		"title": ""
+		"title": "News",
+		"no-news": "No News",
+		"no-news-description": "There are no news items at the moment"
 	},
 	"Notification": {
 		"last-week": "",
@@ -127,7 +129,9 @@
 		"this-week": "",
 		"title": "",
 		"today": "",
-		"yesterday": ""
+		"yesterday": "",
+		"no-notifications": "No Notifications",
+		"no-notifications-description": "You don't have any notifications at the moment"
 	},
 	"Profile": {
 		"clothes-size": "Clothes Size",
