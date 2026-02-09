@@ -46,6 +46,7 @@
 	},
 	"CourseRenew": {
 		"current-course": "在讀課堂",
+		"enrolled": "已報讀",
 		"grade-too-low-to-enroll": "你的等級未能報讀此課程",
 		"is-full": "已滿",
 		"next-step": "下一步",

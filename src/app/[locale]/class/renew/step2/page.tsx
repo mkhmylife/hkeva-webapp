@@ -112,20 +112,28 @@ export default async function CourseDetailPage(props: Props) {
 
         {!canUserEnroll() ? (
           <>
-            {!status.canEnroll ? (
-              <button
-                disabled
-                className="block opacity-50 text-center mt-4 w-full bg-primary text-white font-semibold py-2.5 px-4 rounded-[12px] transition-colors"
-              >
-                {t('CourseRenew.is-full')}
+            {status.status === 'enrolled' ? (
+              <button disabled className="opacity-50 block text-center mt-4 w-full bg-primary text-white font-semibold py-2.5 px-4 rounded-[12px] transition-colors">
+                {t('CourseRenew.enrolled')}
               </button>
             ) : (
-              <button
-                disabled
-                className="block opacity-50 text-center mt-4 w-full bg-primary text-white font-semibold py-2.5 px-4 rounded-[12px] transition-colors"
-              >
-                {t('CourseRenew.grade-too-low-to-enroll')}
-              </button>
+              <>
+                {!status.canEnroll ? (
+                  <button
+                    disabled
+                    className="block opacity-50 text-center mt-4 w-full bg-primary text-white font-semibold py-2.5 px-4 rounded-[12px] transition-colors"
+                  >
+                    {t('CourseRenew.is-full')}
+                  </button>
+                ) : (
+                  <button
+                    disabled
+                    className="block opacity-50 text-center mt-4 w-full bg-primary text-white font-semibold py-2.5 px-4 rounded-[12px] transition-colors"
+                  >
+                    {t('CourseRenew.grade-too-low-to-enroll')}
+                  </button>
+                )}
+              </>
             )}
           </>
         ) : (

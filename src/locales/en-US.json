@@ -46,6 +46,7 @@
 	},
 	"CourseRenew": {
 		"current-course": "",
+		"enrolled": "Enrolled",
 		"grade-too-low-to-enroll": "",
 		"is-full": "",
 		"next-step": "Next",

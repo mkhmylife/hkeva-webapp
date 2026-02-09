@@ -1,4 +1,4 @@
-import {getCourse, getCourses} from "@/libs/course";
+import {getCourse, getCourses, getEnrolledCourses} from "@/libs/course";
 import {getTranslations} from "next-intl/server";
 import BackButton from "@/components/back-button";
 import {ChevronLeft} from "lucide-react";
@@ -27,15 +27,22 @@ export default async function CourseRenewPage(props: Props) {
 
   const t = await getTranslations();
 
-  const me = await getMe();
-  const currentCourse = await getCourse(Number(fromCourseId));
-  const courses = await getCourses({
-    age: age || undefined,
-    level: level || undefined,
-    area: area || undefined,
-    day: day || undefined,
-  });
+  const [currentCourse, enrolledCourses, courses, me] = await Promise.all([
+    getCourse(Number(fromCourseId)),
+    getEnrolledCourses(),
+    getCourses({
+      age: age || undefined,
+      level: level || undefined,
+      area: area || undefined,
+      day: day || undefined,
+    }),
+    getMe(),
+  ]);
+
   const canEnrollCourse = courses.filter(c => {
+    if (enrolledCourses.some(ec => ec.course.id === c.id)) {
+      return false;
+    }
     if (!me.category || !c.category2) {
       return false;
     }
@@ -45,6 +52,9 @@ export default async function CourseRenewPage(props: Props) {
     return c.category2 && c.category2.order <= me.category.order;
   });
   const cannotEnrollCourse = courses.filter(c => {
+    if (enrolledCourses.some(ec => ec.course.id === c.id)) {
+      return true;
+    }
     if (!me.category || !c.category2) {
       return false;
     }

@@ -29,10 +29,18 @@ export default function InvoiceCountdown(props: Props) {
       }
 
       const duration = moment.duration(diff);
-      const mins = Math.floor(duration.asMinutes());
-      const secs = Math.floor(duration.asSeconds() % 60);
+      const days = Math.floor(duration.asDays());
+      const hours = Math.floor(duration.asHours()) % 24;
+      const mins = Math.floor(duration.asMinutes()) % 60;
+      const secs = Math.floor(duration.asSeconds()) % 60;
 
-      return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+      if (days > 0) {
+        return `${days}日${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+      } else if (hours > 0) {
+        return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+      } else {
+        return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+      }
     };
 
     // Initial calculation

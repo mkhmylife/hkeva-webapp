@@ -1,5 +1,5 @@
 import {getTranslations} from "next-intl/server";
-import {getCourse, getCourseEnrollmentStatus} from "@/libs/course";
+import {getCourse} from "@/libs/course";
 import {ChevronLeft} from "lucide-react";
 import {convertWeekdayToNumber} from "@/libs/weekday";
 import moment from "moment/moment";

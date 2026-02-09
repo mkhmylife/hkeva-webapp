@@ -1,6 +1,6 @@
 import {Link} from "@/i18n/navigation";
 import {getTranslations} from "next-intl/server";
-import {getCourses} from "@/libs/course";
+import {getCourses, getEnrolledCourses} from "@/libs/course";
 import CourseCard from "@/components/course-card";
 import BackButton from "@/components/back-button";
 import {ChevronLeft} from "lucide-react";
@@ -30,7 +30,7 @@ export default async function CoursesPage(props: Props) {
 
   const t = await getTranslations();
 
-  const [courses, me] = await Promise.all([
+  const [courses, enrolledCourses, me] = await Promise.all([
     getCourses({
       age: age || undefined,
       level: level || undefined,
@@ -39,19 +39,28 @@ export default async function CoursesPage(props: Props) {
       category: category || undefined,
       code: code || undefined,
     }),
+    getEnrolledCourses(),
     getMe(),
   ]);
 
   const canEnrollCourse = courses.filter(c => {
-    if (!me.category || !c.category2) {
+    const categories = [c.category?.order, c.category2?.order].filter(o => o !== undefined);
+    const categoryOrder = Math.max(...categories);
+    if (enrolledCourses.some(ec => ec.course.id === c.id)) {
+      return false;
+    }
+    if (!me.category) {
       return false;
     }
     if (me.category.order >= 100) {
-      return c.category2 && c.category2.order <= me.category.order && c.category2.order >= 100;
+      return categoryOrder <= me.category.order && categoryOrder >= 100;
     }
-    return c.category2 && c.category2.order <= me.category.order;
+    return categoryOrder <= me.category.order;
   });
   const cannotEnrollCourse = courses.filter(c => {
+    if (enrolledCourses.some(ec => ec.course.id === c.id)) {
+      return true;
+    }
     if (!me.category || !c.category2) {
       return false;
     }

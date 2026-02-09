@@ -32,13 +32,15 @@ export default async function CourseDetailPage(props: Props) {
   const firstLesson = lessons && lessons.length > 0 ? lessons[0] : null;
 
   const canUserEnroll = () => {
-    if (!me.category || !course.category2) {
+    const categories = [course.category?.order, course.category2?.order].filter(o => o !== undefined);
+    const categoryOrder = Math.max(...categories);
+    if (!me.category) {
       return false;
     }
     if (me.category.order >= 100) {
-      return me.category.order >= course.category2.order && course.category2.order >= 100;
+      return me.category.order >= categoryOrder && categoryOrder >= 100;
     }
-    return me.category.order >= course.category2.order;
+    return me.category.order >= categoryOrder;
   }
 
   return (
@@ -111,17 +113,25 @@ export default async function CourseDetailPage(props: Props) {
 
           {canUserEnroll() ? (
             <>
-              {!status.canEnroll ? (
+              {status.status === 'enrolled' ? (
                 <button disabled className="opacity-50 block text-center mt-4 w-full bg-primary text-white font-semibold py-2.5 px-4 rounded-[12px] transition-colors">
-                  {t('CourseRenew.is-full')}
+                  {t('CourseRenew.enrolled')}
                 </button>
               ) : (
-                <Link
-                  href={`/class/courses/${course.id}/enroll`}
-                  className="block text-center mt-4 w-full bg-primary text-white font-semibold py-2.5 px-4 rounded-[12px] transition-colors"
-                >
-                  {t('CourseRenew.next-step')}
-                </Link>
+                <>
+                  {!status.canEnroll ? (
+                    <button disabled className="opacity-50 block text-center mt-4 w-full bg-primary text-white font-semibold py-2.5 px-4 rounded-[12px] transition-colors">
+                      {t('CourseRenew.is-full')}
+                    </button>
+                  ) : (
+                    <Link
+                      href={`/class/courses/${course.id}/enroll`}
+                      className="block text-center mt-4 w-full bg-primary text-white font-semibold py-2.5 px-4 rounded-[12px] transition-colors"
+                    >
+                      {t('CourseRenew.next-step')}
+                    </Link>
+                  )}
+                </>
               )}
             </>
           ) : (

@@ -72,7 +72,7 @@ export const getCourseEnrollmentStatus = async (id: number) => {
   if (!res.ok) {
     throw new Error(res.statusText);
   }
-  return await res.json() as { canEnroll: boolean };
+  return await res.json() as { status: 'enrolled' | 'available' | 'unavailable'; canEnroll: boolean };
 }
 
 export const getLesson = async (id: number) => {
