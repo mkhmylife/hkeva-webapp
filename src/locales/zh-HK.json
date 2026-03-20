@@ -70,6 +70,7 @@
 		}
 	},
 	"EnrollmentLeaveApplication": {
+		"already-applied": "已成功請假",
 		"apply-failed": "請假失敗，請重試",
 		"apply-success": "請假成功",
 		"complete-button": "完成",

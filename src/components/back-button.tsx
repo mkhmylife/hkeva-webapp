@@ -16,6 +16,7 @@ const BackButton = ({ absolute, className = "", children }: IProps) => {
 
   const back = useCallback(() => {
     router.back();
+    router.refresh();
   }, [router]);
 
   return (

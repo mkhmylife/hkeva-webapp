@@ -55,12 +55,11 @@ export default function Checkout(props: IProps) {
   }, [invoice]);
 
   const points = useMemo(() => {
+    const sorted = [...deductibles].sort((a, b) => b.value - a.value).slice(0, 2);
     let availablePoints = 0;
-    for (const deductible of deductibles) {
+    for (const deductible of sorted) {
       if (availablePoints + deductible.value <= invoice.total) {
         availablePoints += deductible.value;
-      } else {
-        break;
       }
     }
     return availablePoints;
