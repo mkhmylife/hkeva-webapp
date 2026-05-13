@@ -33,6 +33,11 @@ export default async function RootLayout({
     >
     <Providers>
       <NextIntlClientProvider>
+        {process.env.NEXT_PUBLIC_IS_BETA === "1" ? (
+          <div className="text-xs text-center bg-yellow-500 w-full font-medium">
+            Testing Environment
+          </div>
+        ) : null}
         <Header />
         <main className="max-w-lg mx-auto pb-20">
           {children}

@@ -11,13 +11,17 @@ export default function Header() {
   return (
     <div className="container mx-auto max-w-lg py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
       <Link href="/">
-        <Image
-          src="/images/logo.svg"
-          alt="HKEVA Logo"
-          width={207}
-          height={48}
-          className="h-8 w-auto"
-        />
+        {process.env.NEXT_PUBLIC_IS_BETA === "1" ? (
+          <div className="font-bold">Sports Student App</div>
+          ) : (
+          <Image
+            src="/images/logo.svg"
+            alt="HKEVA Logo"
+            width={207}
+            height={48}
+            className="h-8 w-auto"
+          />
+        )}
       </Link>
       {!pathname.includes('auth') ? (
         <SettingsMenu />
