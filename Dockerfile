@@ -6,7 +6,7 @@ FROM node:22-alpine AS base
 FROM base AS deps
 ENV TZ=Asia/Hong_Kong
 # Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
-RUN apk add --no-cache libc6-compat
+RUN apk add --no-cache libc6-compat curl
 WORKDIR /app
 
 # Install dependencies based on the preferred package manager
@@ -20,7 +20,7 @@ RUN \
 
 
 # Rebuild the source code only when needed
-FROM base AS builder
+FROM deps AS builder
 WORKDIR /app
 ENV TZ=Asia/Hong_Kong
 
@@ -44,7 +44,7 @@ RUN \
   fi
 
 # Production image, copy all the files and run next
-FROM base AS runner
+FROM deps AS runner
 ENV TZ=Asia/Hong_Kong
 WORKDIR /app
 
