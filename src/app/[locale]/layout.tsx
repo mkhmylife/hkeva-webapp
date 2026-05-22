@@ -11,6 +11,11 @@ import Providers from "@/components/providers";
 export const metadata: Metadata = {
   title: "HKEVA",
   description: "",
+  appleWebApp: {
+    capable: false,
+    statusBarStyle: "default",
+    title: "HKEVA",
+  },
 };
 
 export default async function RootLayout({
@@ -28,6 +33,9 @@ export default async function RootLayout({
 
   return (
     <html lang={locale}>
+    <head>
+      <link rel="apple-touch-icon" href="/images/icon.jpg" />
+    </head>
     <body
       className="antialiased"
     >
