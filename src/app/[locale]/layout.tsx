@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   title: "HKEVA",
   description: "",
   appleWebApp: {
-    capable: false,
+    capable: true,
     statusBarStyle: "default",
     title: "HKEVA",
   },
