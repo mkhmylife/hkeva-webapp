@@ -71,6 +71,11 @@ export default async function CoursesPage(props: Props) {
       return !c.category2 || (c.category2.order > me.category.order || c.category2.order < 100);
     }
     return !c.category2 || (c.category2.order > me.category.order);
+  }).sort((a, b) => {
+    if (level) {
+      return (b.category2?.order || 0) - (a.category2?.order || 0);
+    }
+    return 0;
   });
 
   return (
