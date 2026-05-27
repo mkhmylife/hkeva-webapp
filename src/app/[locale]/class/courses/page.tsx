@@ -58,6 +58,9 @@ export default async function CoursesPage(props: Props) {
     return categoryOrder <= me.category.order;
   });
   const cannotEnrollCourse = courses.filter(c => {
+    if (!level) {
+      return true;
+    }
     if (enrolledCourses.some(ec => ec.course.id === c.id)) {
       return true;
     }

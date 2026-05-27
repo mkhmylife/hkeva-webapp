@@ -25,8 +25,10 @@ export default function CourseCard(props: Props) {
       <div className="w-full">
         <div className="mb-1.5 flex justify-between items-center gap-1">
           <h2 className="font-semibold line-clamp-1">{course.name}</h2>
-          <div className="text-xs text-brand-neutral-500 whitespace-pre">
-            {course.category?.name}{course.category2?.name}
+        </div>
+        <div className="flex items-center gap-2 mb-1.5">
+          <div className="flex text-xs text-brand-neutral-500 whitespace-pre">
+            <p className="max-w-3/4 truncate">{course.category?.name}{course.category2?.name}</p>
             {firstLessson ? (
               <>
                 {" · "}{course.lessons?.length}節
@@ -69,7 +71,7 @@ export default function CourseCard(props: Props) {
             <></>
           )}</p>
         </div>
-        <p className="text-xs tracking-wider font-medium text-brand-neutral-500">{course.code}</p>
+        {/*<p className="text-xs tracking-wider font-medium text-brand-neutral-500">{course.code}</p>*/}
       </div>
     </Card>
   )
