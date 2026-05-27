@@ -1,7 +1,7 @@
 import {useTranslations} from "next-intl";
 import Card from "@/components/card";
 import {CourseDto} from "@/types/courseDto";
-import {Clock3, MapPin, Volleyball} from "lucide-react";
+import {Volleyball} from "lucide-react";
 import moment from "moment";
 import {convertWeekdayToNumber} from "@/libs/weekday";
 
@@ -23,7 +23,7 @@ export default function CourseCard(props: Props) {
         <Volleyball className="size-8 text-primary" />
       </div>
       <div className="w-full">
-        <div className="mb-1.5 flex justify-between items-center gap-1">
+        <div className="mb-1 flex justify-between items-center gap-1">
           <h2 className="font-semibold line-clamp-1">{course.name}</h2>
         </div>
         <div className="flex items-center gap-2 mb-1.5">

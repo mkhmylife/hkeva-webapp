@@ -216,7 +216,7 @@ export default function CourseFilterButton(props: IProps) {
                         <div className="grid grid-cols-4 gap-2 mt-2 text-xs">
                           {[
                             {
-                              label: '新手初階', value: '新手、初階'
+                              label: '體驗', value: '體驗'
                             },
                             {
                               label: '初階', value: '初階'
@@ -280,7 +280,7 @@ export default function CourseFilterButton(props: IProps) {
                               label: 'U16', value: 'U16'
                             },
                             {
-                              label: '成人', value: '成人'
+                              label: '成人', value: 'AD'
                             }
                           ].map(item => {
                             const selected = Array.isArray(value) && value.includes(item.value);
