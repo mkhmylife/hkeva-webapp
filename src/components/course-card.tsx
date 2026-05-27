@@ -28,7 +28,7 @@ export default function CourseCard(props: Props) {
         </div>
         <div className="flex items-center gap-2 mb-1.5">
           <div className="flex text-xs text-brand-neutral-500 whitespace-pre">
-            <p className="max-w-3/4 truncate">{course.category?.name}{course.category2?.name}</p>
+            <p className="">{course.category?.name}{course.category2?.name}</p>
             {firstLessson ? (
               <>
                 {" · "}{course.lessons?.length}節
