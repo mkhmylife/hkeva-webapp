@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
 import {decrypt} from "@/libs/session";
 
 // import createMiddleware from 'next-intl/middleware';
@@ -8,7 +7,7 @@ import {decrypt} from "@/libs/session";
 
 const locales = ['zh-HK', 'en-HK'];
 
-const protectedRoutes = ['/', '/class', '/enrollment', '/profile', '/notification'];
+const protectedRoutes = ['/', '/class', '/enrollment', '/profile', '/notification', '/settings'];
 const publicRoutes = ['/auth/login', '/auth/register', '/auth/forgot-password'];
 
 export default async function proxy(req: NextRequest) {
@@ -34,7 +33,7 @@ export default async function proxy(req: NextRequest) {
   const isPublicRoute = publicRoutes.some(route => path === route || path.startsWith(route + '/'));
 
   // 3. Decrypt the session from the cookie
-  const cookie = (await cookies()).get('session')?.value
+  const cookie = req.cookies.get('session')?.value
   const session = await decrypt(cookie)
 
   // 4. Redirect to /login if the user is not authenticated
@@ -45,8 +44,7 @@ export default async function proxy(req: NextRequest) {
   // 5. Redirect to / if the user is authenticated
   if (
     isPublicRoute &&
-    session?.userId &&
-    !req.nextUrl.pathname.startsWith('/')
+    session?.userId
   ) {
     return NextResponse.redirect(new URL(`/${activeLocale}`, req.nextUrl));
   }
