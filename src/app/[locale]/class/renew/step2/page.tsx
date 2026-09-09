@@ -1,5 +1,5 @@
 import {getTranslations} from "next-intl/server";
-import {getCourse, getCourseEnrollmentStatus} from "@/libs/course";
+import {getCourse, getCourseEnrollmentStatus, getEnrolledCourses} from "@/libs/course";
 import {Volleyball} from "lucide-react";
 import {convertWeekdayToNumber} from "@/libs/weekday";
 import moment from "moment/moment";
@@ -8,6 +8,7 @@ import React from "react";
 import {Link} from "@/i18n/navigation";
 import BackButton from "@/components/back-button";
 import {getMe} from "@/libs/user";
+import {canRenewToCourseThisMonth, isRenewalRestrictedToday} from "@/libs/course-renewal";
 
 type Props = {
   params: Promise<{
@@ -24,19 +25,28 @@ export default async function CourseDetailPage(props: Props) {
   const t = await getTranslations();
 
   const { fromCourseId, toCourseId } = await props.searchParams;
-  const [course, status, me] = await Promise.all([
+  const [course, status, me, enrolledCourses] = await Promise.all([
     getCourse(Number(toCourseId)),
     getCourseEnrollmentStatus(Number(toCourseId)),
-    getMe()
+    getMe(),
+    getEnrolledCourses(),
   ]);
-  const canUserEnroll = () => {
-    if (!status.canEnroll || !me.category || !course.category2) {
+  const isCategoryEligible = () => {
+    if (!me.category || !course.category2) {
       return false;
     }
     if (me.category.order >= 100) {
       return me.category.order >= course.category2.order && course.category2.order >= 100;
     }
     return me.category.order >= course.category2.order;
+  }
+  const isRestricted = isRenewalRestrictedToday();
+  const isBlockedByRenewalWindow = isRestricted && !canRenewToCourseThisMonth(course, enrolledCourses);
+  const canUserEnroll = () => {
+    if (!status.canEnroll || !isCategoryEligible()) {
+      return false;
+    }
+    return !isBlockedByRenewalWindow;
   }
 
   const lessons = course.lessons;
@@ -124,6 +134,13 @@ export default async function CourseDetailPage(props: Props) {
                     className="block opacity-50 text-center mt-4 w-full bg-primary text-white font-semibold py-2.5 px-4 rounded-[12px] transition-colors"
                   >
                     {t('CourseRenew.is-full')}
+                  </button>
+                ) : isCategoryEligible() && isBlockedByRenewalWindow ? (
+                  <button
+                    disabled
+                    className="block opacity-50 text-center mt-4 w-full bg-primary text-white font-semibold py-2.5 px-4 rounded-[12px] transition-colors"
+                  >
+                    {t('CourseRenew.not-related-course-to-enroll')}
                   </button>
                 ) : (
                   <button

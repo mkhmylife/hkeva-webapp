@@ -50,8 +50,10 @@
 		"grade-too-low-to-enroll": "",
 		"is-full": "",
 		"next-step": "Next",
+		"not-related-course-to-enroll": "",
 		"only-two-holidays-can-be-picked": "",
 		"payment": "Payment",
+		"related-course-only-notice": "",
 		"select-course": "",
 		"title": ""
 	},
