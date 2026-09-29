@@ -9,6 +9,8 @@ import CourseCardLarge from "@/components/course-card-large";
 import CourseEnrollButton from "@/components/course-enroll-button";
 import CourseHolidayPicker from "@/components/course-holiday-picker";
 import {getMe} from "@/libs/user";
+import {redirect} from "@/i18n/navigation";
+import {getNewEnrollmentBlockReason, resolveRenewalNow} from "@/libs/course-renewal";
 
 type Props = {
   params: Promise<{
@@ -18,6 +20,7 @@ type Props = {
   searchParams: Promise<{
     holiday1?: string;
     holiday2?: string;
+    debugDate?: string;
   }>;
 }
 
@@ -25,12 +28,20 @@ export default async function CourseDetailPage(props: Props) {
 
   const t = await getTranslations();
 
-  const { id: courseId } = await props.params;
-  const { holiday1, holiday2 } = await props.searchParams;
+  const { id: courseId, locale } = await props.params;
+  const { holiday1, holiday2, debugDate } = await props.searchParams;
   const [course, me] = await Promise.all([
     getCourse(Number(courseId)),
     getMe()
   ]);
+
+  // Opened directly with a course not open for new enrollment today: send the
+  // user back to the course page, which explains why.
+  const { now, isDebug: isDebugDate } = resolveRenewalNow(debugDate);
+  if (getNewEnrollmentBlockReason(course, now)) {
+    redirect({ href: `/class/courses/${courseId}${isDebugDate ? `?debugDate=${debugDate}` : ''}`, locale });
+  }
+
   const lessons = course.lessons;
   const firstLesson = lessons && lessons.length > 0 ? lessons[0] : null;
   const enrolledLessons = lessons?.filter((lesson) => {
@@ -47,6 +58,12 @@ export default async function CourseDetailPage(props: Props) {
           </div>
           <h1 className="text-lg font-semibold">{t('Course.confirm-enrollment')}</h1>
         </BackButton>
+
+        {isDebugDate ? (
+          <div className="mt-2 text-xs font-mono text-amber-800 bg-amber-100 rounded-[12px] px-3 py-2">
+            DEBUG debugDate={debugDate}
+          </div>
+        ) : null}
 
         <div className="mt-2">
           <CourseCardLarge course={course}>
@@ -91,11 +108,13 @@ export default async function CourseDetailPage(props: Props) {
         <CourseHolidayPicker
           course={course}
           user={me}
+          debugDate={isDebugDate ? debugDate : undefined}
         />
 
         <CourseEnrollButton
           course={course}
           holidays={[holiday1, holiday2].filter(h => h !== undefined)}
+          debugDate={isDebugDate ? debugDate : undefined}
         />
       </div>
     </div>

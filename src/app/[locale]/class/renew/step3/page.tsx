@@ -1,15 +1,16 @@
 import {getTranslations} from "next-intl/server";
-import {getCourse} from "@/libs/course";
+import {getCourse, getEnrolledCourses} from "@/libs/course";
 import {ChevronLeft, Volleyball} from "lucide-react";
 import {convertWeekdayToNumber} from "@/libs/weekday";
 import moment from "moment/moment";
 import CourseCalendar from "@/components/course-calendar";
 import React from "react";
-import {Link} from "@/i18n/navigation";
+import {Link, redirect} from "@/i18n/navigation";
 import BackButton from "@/components/back-button";
 import CourseCardLarge from "@/components/course-card-large";
 import CourseEnrollButton from "@/components/course-enroll-button";
 import CourseRenewHolidayPicker from "@/components/course-renew-holiday-picker";
+import {getRenewalBlockReason, resolveRenewalNow} from "@/libs/course-renewal";
 
 type Props = {
   params: Promise<{
@@ -20,6 +21,7 @@ type Props = {
     toCourseId: string;
     holiday1?: string;
     holiday2?: string;
+    debugDate?: string;
   }>;
 }
 
@@ -27,8 +29,22 @@ export default async function CourseDetailPage(props: Props) {
 
   const t = await getTranslations();
 
-  const { fromCourseId, toCourseId, holiday1, holiday2 } = await props.searchParams;
-  const course = await getCourse(Number(toCourseId));
+  const { locale } = await props.params;
+  const { fromCourseId, toCourseId, holiday1, holiday2, debugDate } = await props.searchParams;
+  const [course, fromCourse, enrolledCourses] = await Promise.all([
+    getCourse(Number(toCourseId)),
+    getCourse(Number(fromCourseId)),
+    getEnrolledCourses(),
+  ]);
+
+  // Opened directly with a course the renewal rules block: send the user back
+  // to step 2, which explains why.
+  const { now, isDebug: isDebugDate } = resolveRenewalNow(debugDate);
+  const debugQuery = isDebugDate ? `&debugDate=${debugDate}` : '';
+  if (getRenewalBlockReason(course, fromCourse, enrolledCourses, now)) {
+    redirect({ href: `/class/renew/step2?fromCourseId=${fromCourseId}&toCourseId=${toCourseId}${debugQuery}`, locale });
+  }
+
   const lessons = course.lessons;
   const firstLesson = lessons && lessons.length > 0 ? lessons[0] : null;
   const enrolledLessons = lessons?.filter((lesson) => {
@@ -45,6 +61,12 @@ export default async function CourseDetailPage(props: Props) {
           </div>
           <h1 className="text-lg font-semibold">{t('CourseRenew.payment')}</h1>
         </BackButton>
+
+        {isDebugDate ? (
+          <div className="mt-2 text-xs font-mono text-amber-800 bg-amber-100 rounded-[12px] px-3 py-2">
+            DEBUG debugDate={debugDate}
+          </div>
+        ) : null}
 
         <div className="mt-2">
           <CourseCardLarge course={course}>
@@ -89,12 +111,15 @@ export default async function CourseDetailPage(props: Props) {
         <CourseRenewHolidayPicker
           course={course}
           fromCourseId={fromCourseId}
+          debugDate={isDebugDate ? debugDate : undefined}
         />
 
         <CourseEnrollButton
           course={course}
           holidays={[holiday1, holiday2].filter(h => h !== undefined)}
           isRenewal={true}
+          fromCourseId={fromCourseId}
+          debugDate={isDebugDate ? debugDate : undefined}
         />
       </div>
     </div>

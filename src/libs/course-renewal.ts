@@ -1,10 +1,9 @@
 import {CourseDto} from "@/types/courseDto";
 
-// In month X, renewal is only open for courses held in month X+1. During the
-// first 7 days of month X it is further restricted to courses in the same
-// family as one the user has already applied for (see
-// isRenewalRestrictedToday / getRenewalWindowBlockReason below). From the
-// 8th day onward every course held in month X+1 is open.
+// In month X, renewal is open for courses in the same family as one the user
+// has already applied for, held in any month after X. Other courses must be
+// held in month X+1, and only from the 8th day of month X onward (see
+// isRenewalRestrictedToday / getRenewalWindowBlockReason below).
 const RESTRICTED_WINDOW_DAYS = 7;
 
 /**
@@ -69,30 +68,43 @@ export const isRenewalRestrictedToday = (now: Date = new Date()): boolean => {
  * The month renewals are open for today (the month after `now`), as a
  * year-month key comparable with getCourseMonthKey, e.g. 2026-09-29 -> "26-10".
  */
+const toMonthKey = (date: Date): string => {
+  const yy = String(date.getFullYear() % 100).padStart(2, '0');
+  const mm = String(date.getMonth() + 1).padStart(2, '0');
+  return `${yy}-${mm}`;
+};
+
 export const getRenewalTargetMonth = (now: Date = new Date()): { key: string; month: number } => {
   const target = new Date(now.getFullYear(), now.getMonth() + 1, 1);
-  const yy = String(target.getFullYear() % 100).padStart(2, '0');
-  const mm = String(target.getMonth() + 1).padStart(2, '0');
-  return { key: `${yy}-${mm}`, month: target.getMonth() + 1 };
+  return { key: toMonthKey(target), month: target.getMonth() + 1 };
 };
 
 export type RenewalWindowBlockReason = 'not-next-month' | 'not-related';
 
 /**
  * Why `candidate` cannot be renewed into today, or null when it can:
- * - 'not-next-month': it is not held in the month after the current one.
- * - 'not-related': it is within the first 7 days and `candidate` is not in
- *   the same family as any course the user has applied for.
+ * - A course in the same family as one the user has applied for can be
+ *   picked on any day, as long as it is held after the current month.
+ * - 'not-next-month': any other course must be held in the month after the
+ *   current one.
+ * - 'not-related': within the first 7 days, only same-family courses can be
+ *   picked.
  */
 export const getRenewalWindowBlockReason = (
   candidate: CourseDto,
   appliedCourses: { course: CourseDto }[],
   now: Date = new Date(),
 ): RenewalWindowBlockReason | null => {
-  if (getCourseMonthKey(candidate.code) !== getRenewalTargetMonth(now).key) {
+  const candidateMonth = getCourseMonthKey(candidate.code);
+  const isRelated = appliedCourses.some(ac => isRelatedCourseCode(ac.course.code, candidate.code));
+  // Month keys are "YY-MM", so string comparison orders them chronologically.
+  if (isRelated && candidateMonth !== null && candidateMonth > toMonthKey(now)) {
+    return null;
+  }
+  if (candidateMonth !== getRenewalTargetMonth(now).key) {
     return 'not-next-month';
   }
-  if (isRenewalRestrictedToday(now) && !appliedCourses.some(ac => isRelatedCourseCode(ac.course.code, candidate.code))) {
+  if (isRenewalRestrictedToday(now) && !isRelated) {
     return 'not-related';
   }
   return null;
@@ -175,3 +187,23 @@ export const sortRenewalCandidates = <T extends CourseDto>(courses: T[], fromCou
     (c.category?.id !== undefined && c.category.id === fromCourse.category?.id ? 0 : 1);
   return [...courses].sort((a, b) => rank(a) - rank(b));
 };
+
+export type RenewalBlockReason = 'same-month' | RenewalWindowBlockReason;
+
+/**
+ * Every renewal rule for renewing from `fromCourse` into `candidate`:
+ * the same-month rule plus the renewal window.
+ */
+export const getRenewalBlockReason = (
+  candidate: CourseDto,
+  fromCourse: CourseDto,
+  appliedCourses: { course: CourseDto }[],
+  now: Date = new Date(),
+): RenewalBlockReason | null => {
+  if (isSameMonthAsCourse(candidate, fromCourse)) {
+    return 'same-month';
+  }
+  return getRenewalWindowBlockReason(candidate, appliedCourses, now);
+};
+
+export type EnrollmentBlockReason = RenewalBlockReason | NewEnrollmentBlockReason | 'missing-from-course';

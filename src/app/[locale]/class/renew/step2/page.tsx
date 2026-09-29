@@ -173,7 +173,7 @@ export default async function CourseDetailPage(props: Props) {
           </>
         ) : (
           <Link
-            href={`/class/renew/step3?fromCourseId=${fromCourseId}&toCourseId=${toCourseId}`}
+            href={`/class/renew/step3?fromCourseId=${fromCourseId}&toCourseId=${toCourseId}${isDebugDate ? `&debugDate=${debugDate}` : ''}`}
             className="block text-center mt-4 w-full bg-primary text-white font-semibold py-2.5 px-4 rounded-[12px] transition-colors"
           >
             {t('CourseRenew.next-step')}

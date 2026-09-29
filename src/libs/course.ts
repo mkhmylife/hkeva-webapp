@@ -6,6 +6,7 @@ import {EnrollmentDto, EnrollmentWithCountDto} from "@/types/enrollment";
 import {ApplicationInput} from "@/components/enrollment-leave-application";
 import {LessonDto} from "@/types/lessonDto";
 import {InvoiceDto, InvoiceItemDto} from "@/types/invoiceDto";
+import {EnrollmentBlockReason, getNewEnrollmentBlockReason, getRenewalBlockReason, resolveRenewalNow} from "@/libs/course-renewal";
 
 export const getCourses = async (query?: {
   level?: string | string[];
@@ -161,10 +162,41 @@ export const applyEnrollmentSubstitution = async (enrollmentId: number, swapToLe
   return await res.json() as EnrollmentDto;
 }
 
-export const enrollCourse = async (courseId: number, holidays: string[], isRenewal: boolean) => {
+// Re-checks the renewal / new-enrollment rules on the server, since the
+// pages only hide blocked courses and the enroll URLs can be opened directly.
+const getEnrollmentBlockReason = async (
+  courseId: number,
+  isRenewal: boolean,
+  { fromCourseId, debugDate }: { fromCourseId?: number; debugDate?: string },
+): Promise<EnrollmentBlockReason | null> => {
+  const { now } = resolveRenewalNow(debugDate);
+  if (!isRenewal) {
+    return getNewEnrollmentBlockReason(await getCourse(courseId), now);
+  }
+  if (!fromCourseId) {
+    return 'missing-from-course';
+  }
+  const [course, fromCourse, enrolledCourses] = await Promise.all([
+    getCourse(courseId),
+    getCourse(fromCourseId),
+    getEnrolledCourses(),
+  ]);
+  return getRenewalBlockReason(course, fromCourse, enrolledCourses, now);
+}
+
+export const enrollCourse = async (
+  courseId: number,
+  holidays: string[],
+  isRenewal: boolean,
+  options: { fromCourseId?: number; debugDate?: string } = {},
+): Promise<{ invoice: InvoiceDto; blockedReason?: undefined } | { invoice?: undefined; blockedReason: EnrollmentBlockReason }> => {
+  const blockedReason = await getEnrollmentBlockReason(courseId, isRenewal, options);
+  if (blockedReason) {
+    return { blockedReason };
+  }
   const res = await fetcher('POST', `/app/course/${courseId}/enroll`, { holidays, isRenewal });
   if (!res.ok) {
     throw new Error(res.statusText);
   }
-  return await res.json() as InvoiceDto;
+  return { invoice: await res.json() as InvoiceDto };
 }

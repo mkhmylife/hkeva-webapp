@@ -12,6 +12,7 @@ type IProps = {
   course: CourseDto;
   fromCourseId: string;
   isFull?: boolean;
+  debugDate?: string;
 }
 
 export default function CourseRenewHolidayPicker(props: IProps) {
@@ -46,9 +47,12 @@ export default function CourseRenewHolidayPicker(props: IProps) {
     if (holidays.length === 2) {
       sp.append('holiday2', moment(holidays[1]).format('YYYY-MM-DD'));
     }
+    if (props.debugDate) {
+      sp.append('debugDate', props.debugDate);
+    }
     router.replace(`/class/renew/step3?${sp.toString()}`);
     setIsOpen(false);
-  }, [props.fromCourseId, props.course.id, holidays, router]);
+  }, [props.fromCourseId, props.course.id, props.debugDate, holidays, router]);
 
   return (
     <>

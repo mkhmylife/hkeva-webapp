@@ -13,6 +13,7 @@ type IProps = {
   course: CourseDto;
   user: AuthUserDto;
   isFull?: boolean;
+  debugDate?: string;
 }
 
 export default function CourseHolidayPicker(props: IProps) {
@@ -44,9 +45,12 @@ export default function CourseHolidayPicker(props: IProps) {
     if (holidays.length === 2) {
       sp.append('holiday2', moment(holidays[1]).format('YYYY-MM-DD'));
     }
+    if (props.debugDate) {
+      sp.append('debugDate', props.debugDate);
+    }
     router.replace(`/class/courses/${props.course.id}/enroll?${sp.toString()}`);
     setIsOpen(false);
-  }, [holidays, props.course.id, router]);
+  }, [holidays, props.course.id, props.debugDate, router]);
 
   const canUserEnroll = useMemo(() => {
     if (props.user.category) {
