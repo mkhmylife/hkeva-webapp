@@ -9,6 +9,7 @@ import CourseFilterButton from "@/components/course-filter-button";
 import {getMe} from "@/libs/user";
 import Card from "@/components/card";
 import {Volleyball} from "lucide-react";
+import {getCourseMonthKey, getNewEnrollmentBlockReason, getRenewalTargetMonth, isRenewalRestrictedToday, resolveRenewalNow} from "@/libs/course-renewal";
 
 type Props = {
   params: Promise<{
@@ -21,12 +22,13 @@ type Props = {
     day?: string;
     category?: string;
     code?: string;
+    debugDate?: string;
   }>;
 }
 
 export default async function CoursesPage(props: Props) {
 
-  const { age, level, area, day, category, code } = await props.searchParams;
+  const { age, level, area, day, category, code, debugDate } = await props.searchParams;
 
   const t = await getTranslations();
 
@@ -43,7 +45,13 @@ export default async function CoursesPage(props: Props) {
     getMe(),
   ]);
 
-  const canEnrollCourse = courses.filter(c => {
+  const { now, isDebug: isDebugDate } = resolveRenewalNow(debugDate);
+  const isRenewalPeriod = isRenewalRestrictedToday(now);
+  const debugQuery = isDebugDate ? `?debugDate=${debugDate}` : '';
+  const hasMonthlyCourses = courses.some(c => getCourseMonthKey(c.code) !== null);
+  const isBlockedByEnrollmentWindow = (c: typeof courses[number]) => getNewEnrollmentBlockReason(c, now) !== null;
+
+  const isEligible = (c: typeof courses[number]) => {
     const categories = [c.category?.order, c.category2?.order].filter(o => o !== undefined);
     const categoryOrder = Math.max(...categories);
     if (enrolledCourses.some(ec => ec.course.id === c.id)) {
@@ -56,8 +64,13 @@ export default async function CoursesPage(props: Props) {
       return me.category.order >= categoryOrder && (categoryOrder >= 100 || categoryOrder < 10);
     }
     return categoryOrder <= me.category.order;
-  });
+  };
+  const canEnrollCourse = courses.filter(c => isEligible(c) && !isBlockedByEnrollmentWindow(c));
   const cannotEnrollCourse = courses.filter(c => {
+    // Otherwise eligible, but not open for new enrollment today.
+    if (isEligible(c) && isBlockedByEnrollmentWindow(c)) {
+      return true;
+    }
     if (!me.level) {
       return true;
     }
@@ -98,6 +111,29 @@ export default async function CoursesPage(props: Props) {
         </div>
       </div>
 
+      {isDebugDate ? (
+        <div className="mt-2 text-xs font-mono text-amber-800 bg-amber-100 rounded-[12px] px-3 py-2">
+          DEBUG debugDate={debugDate}
+        </div>
+      ) : null}
+      {hasMonthlyCourses ? (
+        <div className="mt-2 text-xs text-brand-neutral-500 bg-brand-neutral-100 rounded-[12px] px-3 py-2">
+          {isRenewalPeriod ? (
+            <>
+              {t('Course.renewal-period-notice', { month: now.getMonth() + 1 })}
+              {" "}
+              <Link href="/" className="text-primary font-medium underline">{t('Course.go-to-renew')}</Link>
+            </>
+          ) : (
+            <>
+              {t('Course.next-month-only-notice', { month: getRenewalTargetMonth(now).month })}
+              {" "}
+              {t('Course.enrollment-schedule-notice')}
+            </>
+          )}
+        </div>
+      ) : null}
+
       <div className="mt-4 space-y-4">
         {courses.length === 0 ? (
           <Card className="h-[300px] flex flex-col justify-center items-center">
@@ -110,12 +146,12 @@ export default async function CoursesPage(props: Props) {
         ) : (
           <>
             {canEnrollCourse.map((course) => (
-              <Link key={course.id} href={`/class/courses/${course.id}`} className="block">
+              <Link key={course.id} href={`/class/courses/${course.id}${debugQuery}`} className="block">
                 <CourseCard course={course} />
               </Link>
             ))}
             {cannotEnrollCourse.map((course) => (
-              <Link key={course.id} href={`/class/courses/${course.id}`} className="block opacity-50">
+              <Link key={course.id} href={`/class/courses/${course.id}${debugQuery}`} className="block opacity-50">
                 <CourseCard course={course} />
               </Link>
             ))}

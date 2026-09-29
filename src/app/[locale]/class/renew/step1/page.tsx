@@ -7,7 +7,7 @@ import {Link} from "@/i18n/navigation";
 import {getMe} from "@/libs/user";
 import CourseCard from "@/components/course-card";
 import CourseFilterButton from "@/components/course-filter-button";
-import {canRenewToCourseThisMonth, isRenewalRestrictedToday} from "@/libs/course-renewal";
+import {canRenewToCourseThisMonth, getRenewalTargetMonth, isRenewalRestrictedToday, isSameMonthAsCourse, resolveRenewalNow, sortRenewalCandidates} from "@/libs/course-renewal";
 
 type Props = {
   params: Promise<{
@@ -19,12 +19,13 @@ type Props = {
     level?: string;
     age?: string;
     day?: string;
+    debugDate?: string;
   }>;
 }
 
 export default async function CourseRenewPage(props: Props) {
 
-  const { fromCourseId, age, level, area, day } = await props.searchParams;
+  const { fromCourseId, age, level, area, day, debugDate } = await props.searchParams;
 
   const t = await getTranslations();
 
@@ -40,7 +41,10 @@ export default async function CourseRenewPage(props: Props) {
     getMe(),
   ]);
 
-  const isRestricted = isRenewalRestrictedToday();
+  const { now, isDebug: isDebugDate } = resolveRenewalNow(debugDate);
+  const isRestricted = isRenewalRestrictedToday(now);
+  const targetMonth = getRenewalTargetMonth(now).month;
+  const debugQuery = isDebugDate ? `&debugDate=${debugDate}` : '';
 
   const isCategoryEligible = (c: typeof courses[number]) => {
     if (!me.category || !c.category2) {
@@ -52,27 +56,37 @@ export default async function CourseRenewPage(props: Props) {
     return !!(c.category2 && c.category2.order <= me.category.order);
   };
 
-  const canEnrollCourse = courses.filter(c => {
+  const sortedCourses = sortRenewalCandidates(courses, currentCourse);
+
+  const canEnrollCourse = sortedCourses.filter(c => {
     if (enrolledCourses.some(ec => ec.course.id === c.id)) {
       return false;
     }
     if (!isCategoryEligible(c)) {
       return false;
     }
-    if (isRestricted && !canRenewToCourseThisMonth(c, enrolledCourses)) {
+    if (isSameMonthAsCourse(c, currentCourse)) {
+      return false;
+    }
+    if (!canRenewToCourseThisMonth(c, enrolledCourses, now)) {
       return false;
     }
     return true;
   });
-  const cannotEnrollCourse = courses.filter(c => {
+  const cannotEnrollCourse = sortedCourses.filter(c => {
     if (enrolledCourses.some(ec => ec.course.id === c.id)) {
       return true;
     }
     if (!isCategoryEligible(c)) {
       return false;
     }
-    // Category-eligible, but blocked by the first-7-days related-course rule.
-    return isRestricted && !canRenewToCourseThisMonth(c, enrolledCourses);
+    // Category-eligible, but in the same month as the current course.
+    if (isSameMonthAsCourse(c, currentCourse)) {
+      return true;
+    }
+    // Category-eligible, but not held next month, or blocked by the
+    // first-7-days related-course rule.
+    return !canRenewToCourseThisMonth(c, enrolledCourses, now);
   });
 
   return (
@@ -101,19 +115,24 @@ export default async function CourseRenewPage(props: Props) {
       </div>
 
       <h2 className="mt-4 font-semibold text-lg">{t('CourseRenew.select-course')}</h2>
-      {isRestricted ? (
-        <div className="mt-2 text-xs text-brand-neutral-500 bg-brand-neutral-100 rounded-[12px] px-3 py-2">
-          {t('CourseRenew.related-course-only-notice')}
+      {isDebugDate ? (
+        <div className="mt-2 text-xs font-mono text-amber-800 bg-amber-100 rounded-[12px] px-3 py-2">
+          DEBUG debugDate={debugDate}
         </div>
       ) : null}
+      <div className="mt-2 text-xs text-brand-neutral-500 bg-brand-neutral-100 rounded-[12px] px-3 py-2">
+        {isRestricted
+          ? t('CourseRenew.related-course-only-notice', { month: targetMonth })
+          : t('CourseRenew.next-month-only-notice', { month: targetMonth })}
+      </div>
       <div className="space-y-3 my-3">
         {canEnrollCourse.filter(c => c.id.toString() !== fromCourseId).map(course => (
-          <Link key={course.id} href={`/class/renew/step2?fromCourseId=${fromCourseId}&toCourseId=${course.id}`} className="block">
+          <Link key={course.id} href={`/class/renew/step2?fromCourseId=${fromCourseId}&toCourseId=${course.id}${debugQuery}`} className="block">
             <CourseCard course={course} />
           </Link>
         ))}
         {cannotEnrollCourse.filter(c => c.id.toString() !== fromCourseId).map(course => (
-          <Link key={course.id} href={`/class/renew/step2?fromCourseId=${fromCourseId}&toCourseId=${course.id}`} className="block opacity-50">
+          <Link key={course.id} href={`/class/renew/step2?fromCourseId=${fromCourseId}&toCourseId=${course.id}${debugQuery}`} className="block opacity-50">
             <CourseCard course={course} />
           </Link>
         ))}
