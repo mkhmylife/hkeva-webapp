@@ -19,9 +19,25 @@ export default async function EnrollmentSubstitutionPage(props: Props) {
 
   const enrollment = await getEnrollment(id);
 
-  const lessons = await getEnrollmentSwappableLessons(enrollment.id);
+  const swappableLessons = await getEnrollmentSwappableLessons(enrollment.id);
 
   const t = await getTranslations();
+
+  const currentLevel = enrollment.lesson.course?.category2;
+  const isSameLevelOrBelow = (lesson: typeof swappableLessons[number]) => {
+    if (!currentLevel) {
+      return true;
+    }
+    const lessonLevel = lesson.course?.category2;
+    if (!lessonLevel) {
+      return false;
+    }
+    if (currentLevel.order >= 100) {
+      return lessonLevel.order <= currentLevel.order && lessonLevel.order >= 100;
+    }
+    return lessonLevel.order <= currentLevel.order;
+  };
+  const lessons = swappableLessons.filter(isSameLevelOrBelow);
 
   return (
     <div className="container px-4 sm:px-6 lg:px-8">
