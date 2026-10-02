@@ -6,6 +6,7 @@ import {Link} from "@/i18n/navigation";
 import {EnrollmentDto, LessonEnrollmentStatus, SwapApproveStatus} from "@/types/enrollment";
 import {getEnrollment} from "@/libs/course";
 import BackButton from "@/components/back-button";
+import EnrollmentCardMenu from "@/components/enrollment-card-menu";
 
 type Props = {
   enrollment: EnrollmentDto;
@@ -21,21 +22,13 @@ export default async function EnrollmentCard(props: Props) {
 
   const enrollmentWithCount = await getEnrollment(props.enrollment.id);
 
+  const canApplyLeave = props.buttonType === 'leave-sub' && props.enrollment.status === LessonEnrollmentStatus.Enrolled;
+
   const renderButton = () => {
     if (props.buttonType === 'leave-sub' || props.buttonType === 'status') {
-      if (props.enrollment.status === LessonEnrollmentStatus.Enrolled && props.buttonType === 'leave-sub') {
-        return (
-          <div className="mt-2.5 grid grid-cols-1 gap-2">
-            <Link href={`/enrollment/${props.enrollment.id}/leave`}
-                  className="bg-primary-100 rounded-xl py-1 block text-center font-medium">
-              {t('Lesson.apply-for-leave')}
-            </Link>
-            {/*<Link href={`/enrollment/${props.enrollment.id}/substitution`}*/}
-            {/*      className="bg-primary text-white rounded-xl py-2 block text-center font-medium">*/}
-            {/*  {t('Lesson.apply-for-substitution')}*/}
-            {/*</Link>*/}
-          </div>
-        )
+      if (canApplyLeave) {
+        // apply-for-leave lives in the three dots menu next to the title
+        return null;
       }
       if (props.enrollment.status === LessonEnrollmentStatus.Holiday && props.enrollment.swapApproveStatus === SwapApproveStatus.Approved) {
         return (
@@ -123,8 +116,18 @@ export default async function EnrollmentCard(props: Props) {
           {props.enrollment.swapFrom ? `(補)` : null}
           {lesson.course?.name}
         </h2>
-        <div className="text text-brand-neutral-500 whitespace-pre">
-          {lesson.course?.category2?.name}
+        <div className="flex items-center gap-1 shrink-0">
+          <div className="text text-brand-neutral-500 whitespace-pre">
+            {lesson.course?.category2?.name}
+          </div>
+          {canApplyLeave ? (
+            <EnrollmentCardMenu
+              label={t('Lesson.more-actions')}
+              items={[
+                {href: `/enrollment/${props.enrollment.id}/leave`, label: t('Lesson.apply-for-leave')},
+              ]}
+            />
+          ) : null}
         </div>
       </div>
       <Link href={lesson.room?.mapUrl || '/'} target="_blank" className="flex items-center gap-2 mb-2">

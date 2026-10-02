@@ -108,9 +108,10 @@
 	},
 	"Lesson": {
 		"applied-for-leave": "",
-		"apply-for-leave": "",
+		"apply-for-leave": "Apply for leave",
 		"apply-for-substitution": "",
 		"cancelled": "",
+		"more-actions": "More actions",
 		"next-lesson": "",
 		"num-of-lesson": "",
 		"rescheduled": "",
