@@ -8,7 +8,7 @@ import React from "react";
 import {Link} from "@/i18n/navigation";
 import BackButton from "@/components/back-button";
 import {getMe} from "@/libs/user";
-import {canRenewToCourseThisMonth, isRenewalRestrictedToday} from "@/libs/course-renewal";
+import {getRenewalTargetMonth, getRenewalWindowBlockReason, isSameMonthAsCourse, resolveRenewalNow} from "@/libs/course-renewal";
 
 type Props = {
   params: Promise<{
@@ -17,6 +17,7 @@ type Props = {
   searchParams: Promise<{
     fromCourseId: string;
     toCourseId: string;
+    debugDate?: string;
   }>;
 }
 
@@ -24,9 +25,10 @@ export default async function CourseDetailPage(props: Props) {
 
   const t = await getTranslations();
 
-  const { fromCourseId, toCourseId } = await props.searchParams;
-  const [course, status, me, enrolledCourses] = await Promise.all([
+  const { fromCourseId, toCourseId, debugDate } = await props.searchParams;
+  const [course, fromCourse, status, me, enrolledCourses] = await Promise.all([
     getCourse(Number(toCourseId)),
+    getCourse(Number(fromCourseId)),
     getCourseEnrollmentStatus(Number(toCourseId)),
     getMe(),
     getEnrolledCourses(),
@@ -40,13 +42,15 @@ export default async function CourseDetailPage(props: Props) {
     }
     return me.category.order >= course.category2.order;
   }
-  const isRestricted = isRenewalRestrictedToday();
-  const isBlockedByRenewalWindow = isRestricted && !canRenewToCourseThisMonth(course, enrolledCourses);
+  const { now, isDebug: isDebugDate } = resolveRenewalNow(debugDate);
+  const renewalWindowBlockReason = getRenewalWindowBlockReason(course, enrolledCourses, now);
+  const isBlockedByRenewalWindow = renewalWindowBlockReason !== null;
+  const isBlockedBySameMonth = isSameMonthAsCourse(course, fromCourse);
   const canUserEnroll = () => {
     if (!status.canEnroll || !isCategoryEligible()) {
       return false;
     }
-    return !isBlockedByRenewalWindow;
+    return !isBlockedBySameMonth && !isBlockedByRenewalWindow;
   }
 
   const lessons = course.lessons;
@@ -71,6 +75,11 @@ export default async function CourseDetailPage(props: Props) {
           </div>
         </div>
         <p className="text-sm tracking-wider font-medium text-brand-neutral-500">{course.code}</p>
+        {isDebugDate ? (
+          <div className="mt-2 text-xs font-mono text-amber-800 bg-amber-100 rounded-[12px] px-3 py-2">
+            DEBUG debugDate={debugDate}
+          </div>
+        ) : null}
 
         <div className="space-y-2 mt-3">
           <div className="flex items-center gap-2">
@@ -135,12 +144,21 @@ export default async function CourseDetailPage(props: Props) {
                   >
                     {t('CourseRenew.is-full')}
                   </button>
+                ) : isCategoryEligible() && isBlockedBySameMonth ? (
+                  <button
+                    disabled
+                    className="block opacity-50 text-center mt-4 w-full bg-primary text-white font-semibold py-2.5 px-4 rounded-[12px] transition-colors"
+                  >
+                    {t('CourseRenew.same-month-course-to-enroll')}
+                  </button>
                 ) : isCategoryEligible() && isBlockedByRenewalWindow ? (
                   <button
                     disabled
                     className="block opacity-50 text-center mt-4 w-full bg-primary text-white font-semibold py-2.5 px-4 rounded-[12px] transition-colors"
                   >
-                    {t('CourseRenew.not-related-course-to-enroll')}
+                    {renewalWindowBlockReason === 'not-next-month'
+                      ? t('CourseRenew.not-next-month-course-to-enroll', { month: getRenewalTargetMonth(now).month })
+                      : t('CourseRenew.not-related-course-to-enroll')}
                   </button>
                 ) : (
                   <button
@@ -155,7 +173,7 @@ export default async function CourseDetailPage(props: Props) {
           </>
         ) : (
           <Link
-            href={`/class/renew/step3?fromCourseId=${fromCourseId}&toCourseId=${toCourseId}`}
+            href={`/class/renew/step3?fromCourseId=${fromCourseId}&toCourseId=${toCourseId}${isDebugDate ? `&debugDate=${debugDate}` : ''}`}
             className="block text-center mt-4 w-full bg-primary text-white font-semibold py-2.5 px-4 rounded-[12px] transition-colors"
           >
             {t('CourseRenew.next-step')}

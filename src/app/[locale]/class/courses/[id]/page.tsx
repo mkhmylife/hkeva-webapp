@@ -8,11 +8,15 @@ import BackButton from "@/components/back-button";
 import {getMe} from "@/libs/user";
 import {Link} from "@/i18n/navigation";
 import CourseCalendar from "@/components/course-calendar";
+import {getNewEnrollmentBlockReason, getRenewalTargetMonth, resolveRenewalNow} from "@/libs/course-renewal";
 
 type Props = {
   params: Promise<{
     locale: string;
     id: number;
+  }>;
+  searchParams: Promise<{
+    debugDate?: string;
   }>;
 }
 
@@ -21,12 +25,16 @@ export default async function CourseDetailPage(props: Props) {
   const t = await getTranslations();
 
   const { id } = await props.params;
+  const { debugDate } = await props.searchParams;
 
   const [course, status, me] = await Promise.all([
     getCourse(id),
     getCourseEnrollmentStatus(id),
     getMe()
   ]);
+
+  const { now, isDebug: isDebugDate } = resolveRenewalNow(debugDate);
+  const enrollmentBlockReason = getNewEnrollmentBlockReason(course, now);
 
   const lessons = course.lessons;
   const firstLesson = lessons && lessons.length > 0 ? lessons[0] : null;
@@ -62,6 +70,11 @@ export default async function CourseDetailPage(props: Props) {
           </div>
         </div>
         <p className="text-sm tracking-wider font-medium text-brand-neutral-500">{course.code}</p>
+        {isDebugDate ? (
+          <div className="mt-2 text-xs font-mono text-amber-800 bg-amber-100 rounded-[12px] px-3 py-2">
+            DEBUG debugDate={debugDate}
+          </div>
+        ) : null}
 
         <div className="space-y-2 mt-3">
           <div className="flex items-center gap-2">
@@ -119,13 +132,26 @@ export default async function CourseDetailPage(props: Props) {
                 </button>
               ) : (
                 <>
-                  {!status.canEnroll ? (
+                  {enrollmentBlockReason === 'renewal-period' ? (
+                    <>
+                      <button disabled className="opacity-50 block text-center mt-4 w-full bg-primary text-white font-semibold py-2.5 px-4 rounded-[12px] transition-colors">
+                        {t('Course.enrollment-opens-on-8th', { month: now.getMonth() + 1 })}
+                      </button>
+                      <Link href="/" className="block text-center mt-3 text-sm text-primary font-medium underline">
+                        {t('Course.go-to-renew')}
+                      </Link>
+                    </>
+                  ) : enrollmentBlockReason === 'not-next-month' ? (
+                    <button disabled className="opacity-50 block text-center mt-4 w-full bg-primary text-white font-semibold py-2.5 px-4 rounded-[12px] transition-colors">
+                      {t('Course.not-next-month-course-to-enroll', { month: getRenewalTargetMonth(now).month })}
+                    </button>
+                  ) : !status.canEnroll ? (
                     <button disabled className="opacity-50 block text-center mt-4 w-full bg-primary text-white font-semibold py-2.5 px-4 rounded-[12px] transition-colors">
                       {t('CourseRenew.is-full')}
                     </button>
                   ) : (
                     <Link
-                      href={`/class/courses/${course.id}/enroll`}
+                      href={`/class/courses/${course.id}/enroll${isDebugDate ? `?debugDate=${debugDate}` : ''}`}
                       className="block text-center mt-4 w-full bg-primary text-white font-semibold py-2.5 px-4 rounded-[12px] transition-colors"
                     >
                       {t('CourseRenew.next-step')}

@@ -10,6 +10,8 @@ type IProps = {
   course: CourseDto;
   holidays: string[];
   isRenewal?: boolean;
+  fromCourseId?: string;
+  debugDate?: string;
 }
 
 export default function CourseEnrollButton(props: IProps) {
@@ -22,15 +24,24 @@ export default function CourseEnrollButton(props: IProps) {
   const enroll = useCallback(async () => {
     setIsLoading(true);
     try {
-      const invoice = await enrollCourse(props.course.id, props.holidays, props.isRenewal || false);
-      router.replace(`/profile/payments/checkout?courseId=${props.course.id}&invoiceId=${invoice.id}`);
+      const result = await enrollCourse(props.course.id, props.holidays, props.isRenewal || false, {
+        fromCourseId: props.fromCourseId ? Number(props.fromCourseId) : undefined,
+        debugDate: props.debugDate,
+      });
+      if (result.blockedReason) {
+        alert(t('Course.enrollment-blocked'));
+        // The page re-checks the rules and redirects to where the reason is shown.
+        router.refresh();
+        return;
+      }
+      router.replace(`/profile/payments/checkout?courseId=${props.course.id}&invoiceId=${result.invoice.id}`);
     } catch (e) {
       alert(t('Course.enrollment-failed'));
       console.error(e);
     } finally {
       setIsLoading(false);
     }
-  }, [props.course.id, props.holidays, props.isRenewal, router, t]);
+  }, [props.course.id, props.holidays, props.isRenewal, props.fromCourseId, props.debugDate, router, t]);
 
   return (
     <>

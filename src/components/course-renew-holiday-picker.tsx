@@ -12,6 +12,7 @@ type IProps = {
   course: CourseDto;
   fromCourseId: string;
   isFull?: boolean;
+  debugDate?: string;
 }
 
 export default function CourseRenewHolidayPicker(props: IProps) {
@@ -46,9 +47,12 @@ export default function CourseRenewHolidayPicker(props: IProps) {
     if (holidays.length === 2) {
       sp.append('holiday2', moment(holidays[1]).format('YYYY-MM-DD'));
     }
+    if (props.debugDate) {
+      sp.append('debugDate', props.debugDate);
+    }
     router.replace(`/class/renew/step3?${sp.toString()}`);
     setIsOpen(false);
-  }, [props.fromCourseId, props.course.id, holidays, router]);
+  }, [props.fromCourseId, props.course.id, props.debugDate, holidays, router]);
 
   return (
     <>
@@ -56,7 +60,7 @@ export default function CourseRenewHolidayPicker(props: IProps) {
       <button onClick={() => setIsOpen(true)} className="block text-center mt-4 w-full border-primary border text-primary bg-white font-semibold py-2.5 px-4 rounded-[12px] transition-colors">
         {t('Course.select-lessons-that-cant-join')}
       </button>
-      <Dialog open={isOpen} as="div" className="relative z-10 focus:outline-none" onClose={close}>
+      <Dialog open={isOpen} as="div" className="relative z-10 focus:outline-none" onClose={() => setIsOpen(false)}>
         <div className="fixed inset-0 bg-black/50 z-10 w-screen overflow-y-auto">
           <div className="flex min-h-full items-center justify-center p-4">
             <DialogPanel
