@@ -47,7 +47,7 @@ export default async function RootLayout({
           </div>
         ) : null}
         <Header />
-        <main className="max-w-lg mx-auto pb-20">
+        <main className="max-w-lg mx-auto pb-[calc(6rem+env(safe-area-inset-bottom,0px))]">
           {children}
         </main>
         <Footer locale={locale} />

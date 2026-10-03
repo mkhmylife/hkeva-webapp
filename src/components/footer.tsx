@@ -12,7 +12,7 @@ export default function Footer(props: Props) {
   const pathname = usePathname();
 
   return (
-    <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full container mx-auto max-w-lg py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+    <div className="fixed inset-x-0 bottom-0 z-[5] w-full mx-auto max-w-lg pt-4 pb-[calc(1rem+env(safe-area-inset-bottom,0px))] px-4 sm:px-6 lg:px-8 flex justify-between items-center">
       <footer className="bg-primary-900 rounded-full w-full flex items-center justify-between text-white p-1">
         <Link href="/" className={`${pathname === `/` ? 'bg-white text-primary-900' : ''} cursor-pointer rounded-full hover:bg-white hover:text-primary-900 transition-colors h-[56px] w-[56px] flex items-center justify-center`}>
           <House className="w-[24px] h-[24px]"/>
