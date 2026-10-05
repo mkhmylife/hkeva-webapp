@@ -5,6 +5,7 @@ import {convertWeekdayToNumber} from "@/libs/weekday";
 import moment from "moment/moment";
 import CourseCalendar from "@/components/course-calendar";
 import React from "react";
+import Image from "next/image";
 import {Link} from "@/i18n/navigation";
 import BackButton from "@/components/back-button";
 import {getMe} from "@/libs/user";
@@ -58,8 +59,19 @@ export default async function CourseDetailPage(props: Props) {
 
   return (
     <div className="relative">
-      <div className="aspect-[393/200] w-full bg-primary/10 flex items-center justify-center">
-        <Volleyball className="size-12 text-primary"/>
+      <div className="relative aspect-[393/200] w-full overflow-hidden bg-primary/10 flex items-center justify-center">
+        {course.imageUrl ? (
+          <Image
+            src={`${process.env.NEXT_PUBLIC_CDN_URL}/${course.imageUrl}`}
+            alt={course.name}
+            fill
+            sizes="100vw"
+            className="object-cover"
+            unoptimized
+          />
+        ) : (
+          <Volleyball className="size-12 text-primary"/>
+        )}
       </div>
       <BackButton absolute={true} className="top-4 left-4" />
       <div className="container px-4 sm:px-6 lg:px-8 py-4">

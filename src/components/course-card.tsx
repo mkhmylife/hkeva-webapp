@@ -22,7 +22,7 @@ export default function CourseCard(props: Props) {
     <Card className="flex gap-3 items-center">
       <div className="relative aspect-square bg-primary/10 h-24 shrink-0 overflow-hidden rounded-[12px] flex items-center justify-center">
         {course.imageUrl ? (
-          <Image src={course.imageUrl} alt={course.name} fill sizes="96px" className="object-cover" unoptimized />
+          <Image src={`${process.env.NEXT_PUBLIC_CDN_URL}/${course.imageUrl}`} alt={course.name} fill sizes="96px" className="object-cover" unoptimized />
         ) : (
           <Volleyball className="size-8 text-primary" />
         )}

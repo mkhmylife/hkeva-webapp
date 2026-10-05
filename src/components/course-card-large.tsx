@@ -20,7 +20,7 @@ export default function CourseCardLarge(props: Props) {
     <Card>
       <div className="relative aspect-[393/200] w-full overflow-hidden rounded-[12px] bg-primary/10 flex items-center justify-center">
         {course.imageUrl ? (
-          <Image src={course.imageUrl} alt={course.name} fill sizes="(max-width: 640px) 100vw, 393px" className="object-cover" unoptimized />
+          <Image src={`${process.env.NEXT_PUBLIC_CDN_URL}/${course.imageUrl}`} alt={course.name} fill sizes="(max-width: 640px) 100vw, 393px" className="object-cover" unoptimized />
         ) : (
           <Volleyball className="size-12 text-primary"/>
         )}
