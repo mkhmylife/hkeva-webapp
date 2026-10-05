@@ -5,6 +5,7 @@ import moment from "moment";
 import React from "react";
 import {LessonDto} from "@/types/lessonDto";
 import {CourseDto} from "@/types/courseDto";
+import Image from "next/image";
 
 type Props = {
   course: CourseDto;
@@ -17,8 +18,12 @@ export default function CourseCardLarge(props: Props) {
 
   return (
     <Card>
-      <div className="aspect-[393/200] w-full rounded-[12px] bg-primary/10 flex items-center justify-center">
-        <Volleyball className="size-12 text-primary"/>
+      <div className="relative aspect-[393/200] w-full overflow-hidden rounded-[12px] bg-primary/10 flex items-center justify-center">
+        {course.imageUrl ? (
+          <Image src={course.imageUrl} alt={course.name} fill sizes="(max-width: 640px) 100vw, 393px" className="object-cover" unoptimized />
+        ) : (
+          <Volleyball className="size-12 text-primary"/>
+        )}
       </div>
       <div className="py-4">
         <div className="mb-1 flex justify-between items-center gap-1">

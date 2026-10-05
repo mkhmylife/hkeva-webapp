@@ -7,6 +7,7 @@ export interface CourseDto {
   branchId: number;
   code: string;
   name: string;
+  imageUrl?: string | null;
   description?: string;
   pricePerLesson?: number;
   pricePerCourse?: number;

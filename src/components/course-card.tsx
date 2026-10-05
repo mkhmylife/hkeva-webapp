@@ -4,6 +4,7 @@ import {CourseDto} from "@/types/courseDto";
 import {Volleyball} from "lucide-react";
 import moment from "moment";
 import {convertWeekdayToNumber} from "@/libs/weekday";
+import Image from "next/image";
 
 type Props = {
   course: CourseDto;
@@ -19,8 +20,12 @@ export default function CourseCard(props: Props) {
 
   return (
     <Card className="flex gap-3 items-center">
-      <div className="aspect-square bg-primary/10 h-24 rounded-[12px] flex items-center justify-center">
-        <Volleyball className="size-8 text-primary" />
+      <div className="relative aspect-square bg-primary/10 h-24 shrink-0 overflow-hidden rounded-[12px] flex items-center justify-center">
+        {course.imageUrl ? (
+          <Image src={course.imageUrl} alt={course.name} fill sizes="96px" className="object-cover" unoptimized />
+        ) : (
+          <Volleyball className="size-8 text-primary" />
+        )}
       </div>
       <div className="w-full">
         <div className="mb-1 flex justify-between items-center gap-1">
