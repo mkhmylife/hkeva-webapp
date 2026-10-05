@@ -23,6 +23,7 @@ export default async function EnrollmentSubstitutionPage(props: Props) {
 
   const t = await getTranslations();
 
+  const currentCourseId = enrollment.lesson.course?.id ?? enrollment.course.id;
   const currentLevel = enrollment.lesson.course?.category2;
   const isSameLevelOrBelow = (lesson: typeof swappableLessons[number]) => {
     if (!currentLevel) {
@@ -37,7 +38,9 @@ export default async function EnrollmentSubstitutionPage(props: Props) {
     }
     return lessonLevel.order <= currentLevel.order;
   };
-  const lessons = swappableLessons.filter(isSameLevelOrBelow);
+  const lessons = swappableLessons.filter(
+    lesson => lesson.course?.id !== currentCourseId && isSameLevelOrBelow(lesson)
+  );
 
   return (
     <div className="container px-4 sm:px-6 lg:px-8">
