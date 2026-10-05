@@ -4,6 +4,7 @@ import {convertWeekdayToNumber} from "@/libs/weekday";
 import moment from "moment";
 import React from "react";
 import {LessonDto} from "@/types/lessonDto";
+import Image from "next/image";
 
 type Props = {
   lesson: LessonDto;
@@ -16,8 +17,19 @@ export default function LessonCardLarge(props: Props) {
 
   return (
     <Card>
-      <div className="aspect-[393/200] w-full rounded-[12px] bg-primary/10 flex items-center justify-center">
-        <Volleyball className="size-12 text-primary"/>
+      <div className="relative aspect-[393/200] w-full overflow-hidden rounded-[12px] bg-primary/10 flex items-center justify-center">
+        {lesson.course?.imageUrl ? (
+          <Image
+            src={`${process.env.NEXT_PUBLIC_CDN_URL}/${lesson.course.imageUrl}`}
+            alt={lesson.course.name}
+            fill
+            sizes="(max-width: 640px) 100vw, 393px"
+            className="object-cover"
+            unoptimized
+          />
+        ) : (
+          <Volleyball className="size-12 text-primary"/>
+        )}
       </div>
       <div className="py-4">
         <div className="mb-1 flex justify-between items-center gap-1">

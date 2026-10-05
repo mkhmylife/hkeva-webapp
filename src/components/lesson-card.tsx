@@ -5,6 +5,7 @@ import {Clock3, MapPin, Volleyball} from "lucide-react";
 import moment from "moment";
 import {convertWeekdayToNumber} from "@/libs/weekday";
 import {LessonDto} from "@/types/lessonDto";
+import Image from "next/image";
 
 type Props = {
   lesson: LessonDto;
@@ -18,8 +19,19 @@ export default function LessonCard(props: Props) {
 
   return (
     <Card className="flex gap-3 items-center">
-      <div className="aspect-square bg-primary/10 h-24 rounded-[12px] flex items-center justify-center">
-        <Volleyball className="size-8 text-primary" />
+      <div className="relative aspect-square bg-primary/10 h-24 shrink-0 overflow-hidden rounded-[12px] flex items-center justify-center">
+        {lesson.course?.imageUrl ? (
+          <Image
+            src={`${process.env.NEXT_PUBLIC_CDN_URL}/${lesson.course.imageUrl}`}
+            alt={lesson.course.name}
+            fill
+            sizes="96px"
+            className="object-cover"
+            unoptimized
+          />
+        ) : (
+          <Volleyball className="size-8 text-primary" />
+        )}
       </div>
       <div className="w-full">
         <div className="mb-1.5 flex justify-between items-center gap-1">
