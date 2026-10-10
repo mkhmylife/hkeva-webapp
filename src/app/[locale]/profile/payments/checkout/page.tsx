@@ -8,6 +8,7 @@ import {notFound} from "next/navigation";
 import {getEnrolledCourse, getEnrollmentDeductible} from "@/libs/course";
 import Checkout from "@/components/checkout";
 import InvoiceCountdown from "@/components/invoice-countdown";
+import { LessonEnrollmentStatus } from "@/types/enrollment";
 
 type IProps = {
   searchParams: Promise<{
@@ -49,7 +50,7 @@ export default async function PaymentCheckoutPage(props: IProps) {
           <Checkout
             course={course}
             invoice={invoice}
-            deductibles={deductibles}
+            deductibles={deductibles.filter(d => d.status === LessonEnrollmentStatus.Cancelled)}
           />
 
           <div className="mt-4">
