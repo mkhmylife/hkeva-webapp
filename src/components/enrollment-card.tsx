@@ -7,6 +7,7 @@ import {EnrollmentDto, LessonEnrollmentStatus, SwapApproveStatus} from "@/types/
 import {getEnrollment} from "@/libs/course";
 import BackButton from "@/components/back-button";
 import EnrollmentCardMenu from "@/components/enrollment-card-menu";
+import {canApplyEnrollmentSubstitution} from "@/libs/enrollment-substitution";
 
 type Props = {
   enrollment: EnrollmentDto;
@@ -30,7 +31,7 @@ export default async function EnrollmentCard(props: Props) {
         // apply-for-leave lives in the three dots menu next to the title
         return null;
       }
-      if (props.enrollment.status === LessonEnrollmentStatus.Holiday && props.enrollment.swapApproveStatus === SwapApproveStatus.Approved) {
+      if (props.enrollment.status === LessonEnrollmentStatus.Holiday && canApplyEnrollmentSubstitution(props.enrollment)) {
         return (
           <div className="mt-2.5 grid grid-cols-1 gap-2">
             <Link href={`/enrollment/${props.enrollment.id}/substitution`}

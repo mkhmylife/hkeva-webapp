@@ -111,6 +111,7 @@
 		"todo": "待辦事項"
 	},
 	"Lesson": {
+		"credit-used": "已使用補堂面額",
 		"applied-for-leave": "已請假",
 		"apply-for-leave": "申請請假",
 		"apply-for-substitution": "申請補堂",

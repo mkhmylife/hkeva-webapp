@@ -6,6 +6,7 @@ import {Link} from "@/i18n/navigation";
 import {EnrollmentDto, LessonEnrollmentStatus, SwapApproveStatus} from "@/types/enrollment";
 import {getEnrollment} from "@/libs/course";
 import BackButton from "@/components/back-button";
+import {canApplyEnrollmentSubstitution} from "@/libs/enrollment-substitution";
 
 type Props = {
   enrollment: EnrollmentDto;
@@ -20,7 +21,7 @@ export default async function EnrollmentHolidayStatusCard(props: Props) {
   const enrollmentWithCount = await getEnrollment(props.enrollment.id);
 
   const renderButton = () => {
-    if (!props.enrollment.hasSwapped) {
+    if (canApplyEnrollmentSubstitution(props.enrollment)) {
       return (
         <div className="mt-2.5 grid grid-cols-1 gap-2">
           <Link href={`/enrollment/${props.enrollment.id}/substitution`}
@@ -36,6 +37,13 @@ export default async function EnrollmentHolidayStatusCard(props: Props) {
           <div className="bg-primary-100 opacity-50 rounded-xl py-1 block text-center font-medium">
             {t('Lesson.rescheduled')}
           </div>
+        </div>
+      );
+    }
+    if ([LessonEnrollmentStatus.InvoiceSwapped, LessonEnrollmentStatus.InvoiceSwappedAsPoint].includes(props.enrollment.status)) {
+      return (
+        <div className="mt-2.5 rounded-xl bg-primary-100 py-1 text-center font-medium opacity-50">
+          {t('Lesson.credit-used')}
         </div>
       );
     }

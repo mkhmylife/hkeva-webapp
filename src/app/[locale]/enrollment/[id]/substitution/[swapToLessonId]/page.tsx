@@ -5,6 +5,8 @@ import {ArrowDown, ChevronLeft} from "lucide-react";
 import BackButton from "@/components/back-button";
 import React from "react";
 import EnrollmentSubstitutionApplication from "@/components/enrollment-substitution-application";
+import {canApplyEnrollmentSubstitution} from "@/libs/enrollment-substitution";
+import {notFound} from "next/navigation";
 
 type Props = {
   params: Promise<{
@@ -19,6 +21,9 @@ export default async function EnrollmentSubstitutionSwapToPage(props: Props) {
   const { id, swapToLessonId } = await props.params;
 
   const enrollment = await getEnrollment(id);
+  if (!canApplyEnrollmentSubstitution(enrollment)) {
+    notFound();
+  }
   const swapToLesson = await getLesson(swapToLessonId);
 
   const t = await getTranslations();

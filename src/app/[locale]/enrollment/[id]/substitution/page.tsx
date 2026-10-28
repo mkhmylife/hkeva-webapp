@@ -6,6 +6,7 @@ import React from "react";
 import LessonCard from "@/components/lesson-card";
 import {Link} from "@/i18n/navigation";
 import {notFound} from "next/navigation";
+import {canApplyEnrollmentSubstitution} from "@/libs/enrollment-substitution";
 
 type Props = {
   params: Promise<{
@@ -23,6 +24,9 @@ export default async function EnrollmentSubstitutionPage(props: Props) {
   }
 
   const enrollment = await getEnrollment(enrollmentId);
+  if (!canApplyEnrollmentSubstitution(enrollment)) {
+    notFound();
+  }
 
   const swappableLessons = await getEnrollmentSwappableLessons(enrollment.id);
 
