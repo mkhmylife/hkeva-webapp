@@ -6,6 +6,7 @@ import React, {useCallback, useEffect} from "react";
 import {useTranslations} from "next-intl";
 import {useForm} from "react-hook-form";
 import {updateClothesSize} from "@/libs/user";
+import {unstable_rethrow} from "next/navigation";
 
 type Input = {
   clothesSize: string;
@@ -27,6 +28,7 @@ export default function ProfileClothesSizePicker(props: IProps) {
       try {
         await updateClothesSize(value);
       } catch (e) {
+        unstable_rethrow(e);
         alert(e);
       }
     }

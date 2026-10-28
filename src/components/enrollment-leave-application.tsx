@@ -10,7 +10,7 @@ import ImageUploading, {ImageListType} from 'react-images-uploading';
 import {Images} from "lucide-react";
 import {applyEnrollmentLeave} from "@/libs/course";
 import {EnrollmentWithCountDto, LessonEnrollmentStatus} from "@/types/enrollment";
-import {useRouter} from "next/navigation";
+import {unstable_rethrow, useRouter} from "next/navigation";
 
 export type ApplicationInput = {
   type?: 'sick' | 'exam' | 'school-activity' | 'travel' | 'other';
@@ -61,6 +61,7 @@ export default function EnrollmentLeaveApplication(props: Props) {
       const enrollment = await applyEnrollmentLeave(props.enrollment.id, data);
       router.replace(`/enrollment/${props.enrollment.id}/leave/success`);
     } catch (e) {
+      unstable_rethrow(e);
       alert(t('EnrollmentLeaveApplication.apply-failed'));
     } finally {
       setIsLoading(false);

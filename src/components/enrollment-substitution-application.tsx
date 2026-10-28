@@ -7,6 +7,7 @@ import {useTranslations} from "next-intl";
 import {EnrollmentDto} from "@/types/enrollment";
 import {applyEnrollmentSubstitution} from "@/libs/course";
 import {useRouter} from "@/i18n/navigation";
+import {unstable_rethrow} from "next/navigation";
 
 type Props = {
   enrollment: EnrollmentDto;
@@ -28,6 +29,7 @@ export default function EnrollmentSubstitutionApplication(props: Props) {
       const swappedEnrollment = await applyEnrollmentSubstitution(props.enrollment.id, props.swapToLesson.id);
       router.replace(`/enrollment/${swappedEnrollment.id}/substitution/success`);
     } catch (e) {
+      unstable_rethrow(e);
       alert(t('EnrollmentSubstitutionApplication.swap-failed'));
     } finally {
       setIsLoading(false);

@@ -130,6 +130,7 @@
 		"please-fill-in-all-required-fields": "請填妥所有項目",
 		"pick-student": "選擇學生帳號",
 		"student-id": "學生編號",
+		"session-expired": "登入已逾時，請重新登入。",
 		"title": "登入"
 	},
 	"News": {

@@ -89,7 +89,6 @@ export const login = async (payload: {
     throw new Error(res.statusText);
   }
   const { accessToken, id } = await res.json() as { accessToken: string; id: number };
-  console.log(accessToken);
   await createSession(accessToken);
   // return { accessToken, refreshToken }
 }

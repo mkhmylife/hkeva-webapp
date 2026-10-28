@@ -3,7 +3,8 @@
 import {useTranslations} from "next-intl";
 import {Controller, useForm} from "react-hook-form";
 import InputField from "@/components/Form/InputField";
-import React, {useCallback, useState} from "react";
+import React, {Suspense, useCallback, useState} from "react";
+import {useSearchParams} from "next/navigation";
 import PhoneNumberInputField from "@/components/Form/PhoneNumberInputField";
 import {useRouter} from "@/i18n/navigation";
 import {login, loginPickStudents, loginWithStudentToken} from "@/libs/auth";
@@ -17,8 +18,13 @@ interface LoginFormDto {
 
 
 export default function LoginPage() {
+  return <Suspense><LoginForm /></Suspense>;
+}
+
+function LoginForm() {
 
   const t = useTranslations();
+  const searchParams = useSearchParams();
 
   const router = useRouter();
 
@@ -66,6 +72,11 @@ export default function LoginPage() {
 
   return (
     <div className="container px-4 sm:px-6 lg:px-8">
+      {searchParams.get('reason') === 'session-expired' ? (
+        <p role="status" className="mt-4 rounded-xl bg-primary/10 p-3 text-brand-neutral-900">
+          {t('Login.session-expired')}
+        </p>
+      ) : null}
       {/*<AuthHeader active={'login'} showSegmentControl={true}/>*/}
 
       {students.length === 0 ? (

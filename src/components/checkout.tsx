@@ -11,6 +11,7 @@ import {applyPointsInInvoice, payInvoice, unapplyPointsInInvoice} from "@/libs/i
 import {useRouter} from "@/i18n/navigation";
 import {getEnrollmentDeductible} from "@/libs/course";
 import moment from "moment";
+import {unstable_rethrow} from "next/navigation";
 
 type IProps = {
   course: CourseDto;
@@ -108,6 +109,7 @@ export default function Checkout(props: IProps) {
       }
       router.replace(`/profile/payments?type=paid`);
     } catch (e) {
+      unstable_rethrow(e);
       console.log(e);
     } finally {
       setIsLoading(false);

@@ -5,6 +5,7 @@ import Card from './card';
 import {Camera} from 'lucide-react';
 import {updateProfilePic} from "@/libs/user";
 import {useTranslations} from "next-intl";
+import {unstable_rethrow} from "next/navigation";
 
 type Props = {
   className?: string;
@@ -59,6 +60,7 @@ export default function ProfilePicUploader({className, label}: Props) {
         await updateProfilePic(payload);
         window.location.reload();
       } catch (err: unknown) {
+        unstable_rethrow(err);
         let message = 'Upload failed';
         if (err instanceof Error) message = err.message;
         setError(message);

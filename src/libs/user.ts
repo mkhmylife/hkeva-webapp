@@ -1,7 +1,7 @@
 'use server';
 
 import {fetcher} from "./fetcher";
-import {notFound, redirect} from "next/navigation";
+import {notFound} from "next/navigation";
 import {AuthUserDto, ToDoDto} from "@/types/userDto";
 import {NotificationDto, UserNotificationDto} from "@/types/notificationDto";
 
@@ -10,9 +10,6 @@ export const getMe = async () => {
   if (!res.ok) {
     if (res.status === 404) {
       notFound();
-    }
-    if (res.status === 401) {
-      redirect('/auth/login');
     }
     throw new Error(res.statusText);
   }

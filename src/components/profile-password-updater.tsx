@@ -6,6 +6,7 @@ import { updatePassword } from "@/libs/auth";
 import { KeyRound } from "lucide-react";
 import { useState } from "react";
 import Card from "@/components/card";
+import {unstable_rethrow} from "next/navigation";
 
 type Input = {
   password: string;
@@ -31,6 +32,7 @@ export default function ProfilePasswordUpdater() {
       alert(t('Profile.password-updated'));
       reset();
     } catch (e) {
+      unstable_rethrow(e);
       alert(t('Profile.password-update-failed'));
     } finally {
       setIsSubmitting(false);

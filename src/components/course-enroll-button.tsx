@@ -5,6 +5,7 @@ import {useCallback, useState} from "react";
 import {CourseDto} from "@/types/courseDto";
 import {enrollCourse} from "@/libs/course";
 import {useRouter} from "@/i18n/navigation";
+import {unstable_rethrow} from "next/navigation";
 
 type IProps = {
   course: CourseDto;
@@ -36,6 +37,7 @@ export default function CourseEnrollButton(props: IProps) {
       }
       router.replace(`/profile/payments/checkout?courseId=${props.course.id}&invoiceId=${result.invoice.id}`);
     } catch (e) {
+      unstable_rethrow(e);
       alert(t('Course.enrollment-failed'));
       console.error(e);
     } finally {
