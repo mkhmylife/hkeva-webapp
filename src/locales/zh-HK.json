@@ -95,11 +95,15 @@
 		"upload-proof": "上傳事假證明"
 	},
 	"EnrollmentSubstitutionApplication": {
+		"back-to-lessons": "返回課堂記錄",
 		"confirm-swap": "請確認想參與以上課堂作為補堂？",
 		"select-lesson": "選擇課堂",
+		"no-lessons": "暫時沒有可供選擇的補堂，請稍後再試或聯絡職員。",
 		"success-title": "換堂成功",
 		"swap-failed": "未能補堂，請重試",
-		"title": "補堂"
+		"title": "補堂",
+		"unavailable-title": "未能找到補堂資料",
+		"unavailable-description": "這項課堂記錄或補堂資料暫時未能提供。請返回課堂記錄重新選擇；如問題持續，請聯絡職員。"
 	},
 	"Home": {
 		"no-enrollments": "沒有課堂",

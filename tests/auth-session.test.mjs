@@ -1,36 +1,12 @@
 import assert from 'node:assert/strict';
-import {readFileSync} from 'node:fs';
 import {createRequire} from 'node:module';
 import test from 'node:test';
-import vm from 'node:vm';
 import * as jose from 'jose';
-import ts from 'typescript';
+import {loadSource} from './helpers/load-source.mjs';
 
 const require = createRequire(import.meta.url);
 const {NextRequest, NextResponse} = require('next/server');
 const {redirect, unstable_rethrow} = require('next/navigation');
-
-// Exercise the real session code and jose verification, substituting only
-// Next.js request context APIs that need a running application.
-function loadSource(file, imports, globals = {}) {
-  const source = readFileSync(new URL(`../${file}`, import.meta.url), 'utf8');
-  const {outputText} = ts.transpileModule(source, {
-    compilerOptions: {module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022},
-  });
-  const sourceModule = {exports: {}};
-  vm.runInNewContext(outputText, {
-    module: sourceModule,
-    exports: sourceModule.exports,
-    require: (name) => {
-      assert.ok(Object.hasOwn(imports, name), `Unexpected import: ${name}`);
-      return imports[name];
-    },
-    TextEncoder, Date, URL, console,
-    process: {env: {SESSION_SECRET: 'test-only-session-secret'}},
-    ...globals,
-  }, {filename: file});
-  return sourceModule.exports;
-}
 
 const writtenCookies = [];
 const logs = [];
@@ -114,7 +90,7 @@ test('expired cookies on public pages are cleared and locale redirects preserve 
   assert.equal(localized.headers.get('location'), 'https://app.example/zh-HK/auth/login?reason=session-expired');
 });
 
-function makeFetcher(auth, fetchImpl, {isAction = false, deleteCookie = () => {}} = {}) {
+function makeFetcher(auth, fetchImpl, {isAction = false, deleteCookie = () => {}, logError = () => {}} = {}) {
   return loadSource('src/libs/fetcher.ts', {
     'next/navigation': {redirect},
     '@/libs/auth': {verifyAuth: async () => auth},
@@ -123,7 +99,7 @@ function makeFetcher(auth, fetchImpl, {isAction = false, deleteCookie = () => {}
       headers: async () => new Headers(isAction ? {'next-action': 'test-action'} : {}),
       cookies: async () => ({delete: deleteCookie}),
     },
-  }, {fetch: fetchImpl}).fetcher;
+  }, {fetch: fetchImpl, console: {error: logError}}).fetcher;
 }
 
 function assertLoginRedirect(error) {
@@ -170,4 +146,15 @@ test('server component redirects never try to modify read-only cookies', async (
     deleteCookie: () => assert.fail('Cannot mutate cookies during render'),
   });
   await assert.rejects(fetcher('GET', '/app/me'), assertLoginRedirect);
+});
+
+test('API errors identify the failed endpoint and status without logging credentials or response data', async () => {
+  const errorLogs = [];
+  const response = new Response(JSON.stringify({privateData: 'must-not-be-logged'}), {status: 404, statusText: 'Not Found'});
+  const fetcher = makeFetcher({accessToken: 'must-not-be-logged'}, async () => response, {
+    logError: (message) => errorLogs.push(message),
+  });
+  assert.equal(await fetcher('GET', '/app/enrollment/20596/swappable-lessons'), response);
+  assert.deepEqual(errorLogs, ['API request failed: GET /app/enrollment/20596/swappable-lessons (404 Not Found)']);
+  assert.deepEqual(await response.json(), {privateData: 'must-not-be-logged'});
 });

@@ -7,6 +7,7 @@ import {ApplicationInput} from "@/components/enrollment-leave-application";
 import {LessonDto} from "@/types/lessonDto";
 import {InvoiceDto, InvoiceItemDto} from "@/types/invoiceDto";
 import {EnrollmentBlockReason, getNewEnrollmentBlockReason, getRenewalBlockReason, resolveRenewalNow} from "@/libs/course-renewal";
+import {notFound} from "next/navigation";
 
 export const getCourses = async (query?: {
   level?: string | string[];
@@ -130,6 +131,9 @@ export const getEnrollmentHolidays = async () => {
 
 export const getEnrollment = async (id: number) => {
   const res = await fetcher('GET', `/app/enrollment/${id}`);
+  if (res.status === 404) {
+    notFound();
+  }
   if (!res.ok) {
     throw new Error(res.statusText);
   }
@@ -138,6 +142,9 @@ export const getEnrollment = async (id: number) => {
 
 export const getEnrollmentSwappableLessons = async (fromEnrollmentId: number) => {
   const res = await fetcher('GET', `/app/enrollment/${fromEnrollmentId}/swappable-lessons`);
+  if (res.status === 404) {
+    notFound();
+  }
   if (!res.ok) {
     throw new Error(res.statusText);
   }

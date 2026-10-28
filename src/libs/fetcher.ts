@@ -34,5 +34,8 @@ export const fetcher = async (method: string, path: string, body?: any) => {
   if (res.status === 401) {
     await redirectToLogin();
   }
+  if (!res.ok) {
+    console.error(`API request failed: ${method} ${path} (${res.status} ${res.statusText})`);
+  }
   return res;
 }

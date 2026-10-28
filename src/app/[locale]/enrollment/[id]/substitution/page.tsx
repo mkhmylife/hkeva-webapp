@@ -5,19 +5,24 @@ import {ChevronLeft} from "lucide-react";
 import React from "react";
 import LessonCard from "@/components/lesson-card";
 import {Link} from "@/i18n/navigation";
+import {notFound} from "next/navigation";
 
 type Props = {
   params: Promise<{
     locale: string;
-    id: number;
+    id: string;
   }>;
 }
 
 export default async function EnrollmentSubstitutionPage(props: Props) {
 
   const { id } = await props.params;
+  const enrollmentId = Number(id);
+  if (!Number.isSafeInteger(enrollmentId) || enrollmentId <= 0) {
+    notFound();
+  }
 
-  const enrollment = await getEnrollment(id);
+  const enrollment = await getEnrollment(enrollmentId);
 
   const swappableLessons = await getEnrollmentSwappableLessons(enrollment.id);
 
@@ -62,6 +67,11 @@ export default async function EnrollmentSubstitutionPage(props: Props) {
 
       <h2 className="mt-4 font-semibold text-lg">{t('EnrollmentSubstitutionApplication.select-lesson')}</h2>
       <div className="space-y-3 my-3">
+        {lessons.length === 0 ? (
+          <p role="status" className="rounded-xl bg-primary/10 p-4 text-brand-neutral-600">
+            {t('EnrollmentSubstitutionApplication.no-lessons')}
+          </p>
+        ) : null}
         {lessons.map(lesson => (
           <Link key={lesson.id} href={`/enrollment/${enrollment.id}/substitution/${lesson.id}`} className="block">
             <LessonCard lesson={lesson} />
