@@ -9,7 +9,7 @@ import BackButton from "@/components/back-button";
 import {getMe} from "@/libs/user";
 import {Link} from "@/i18n/navigation";
 import CourseCalendar from "@/components/course-calendar";
-import {getNewEnrollmentBlockReason, getRenewalTargetMonth, resolveRenewalNow} from "@/libs/course-renewal";
+import {getNewEnrollmentBlockReason, getRenewalTargetMonths, resolveRenewalNow} from "@/libs/course-renewal";
 
 type Props = {
   params: Promise<{
@@ -35,6 +35,8 @@ export default async function CourseDetailPage(props: Props) {
   ]);
 
   const { now, isDebug: isDebugDate } = resolveRenewalNow(debugDate);
+  const targetMonths = getRenewalTargetMonths(now);
+  const enrollmentPeriod = { startMonth: targetMonths[0].month, endMonth: targetMonths[1].month };
   const enrollmentBlockReason = getNewEnrollmentBlockReason(course, now);
 
   const lessons = course.lessons;
@@ -153,9 +155,9 @@ export default async function CourseDetailPage(props: Props) {
                         {t('Course.go-to-renew')}
                       </Link>
                     </>
-                  ) : enrollmentBlockReason === 'not-next-month' ? (
+                  ) : enrollmentBlockReason === 'outside-enrollment-period' ? (
                     <button disabled className="opacity-50 block text-center mt-4 w-full bg-primary text-white font-semibold py-2.5 px-4 rounded-[12px] transition-colors">
-                      {t('Course.not-next-month-course-to-enroll', { month: getRenewalTargetMonth(now).month })}
+                      {t('Course.outside-enrollment-period-course-to-enroll', enrollmentPeriod)}
                     </button>
                   ) : !status.canEnroll ? (
                     <button disabled className="opacity-50 block text-center mt-4 w-full bg-primary text-white font-semibold py-2.5 px-4 rounded-[12px] transition-colors">

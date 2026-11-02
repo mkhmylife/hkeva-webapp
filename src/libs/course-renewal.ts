@@ -1,9 +1,9 @@
 import {CourseDto} from "@/types/courseDto";
 
-// In month X, renewal is open for courses in the same family as one the user
-// has already applied for, held in any month after X. Other courses must be
-// held in month X+1, and only from the 8th day of month X onward (see
-// isRenewalRestrictedToday / getRenewalWindowBlockReason below).
+// On days 1–7 of even months, renewal is limited to the same course family.
+// From the 8th, other courses open for the following two months and stay open
+// throughout the intervening odd month (e.g. Oct 8–Nov 30 opens Nov and Dec).
+// Related courses held after the current month remain available for renewal.
 const RESTRICTED_WINDOW_DAYS = 7;
 
 /**
@@ -57,16 +57,15 @@ export const resolveRenewalNow = (debugDate?: string): { now: Date; isDebug: boo
 };
 
 /**
- * True on the 1st through 7th of the month (inclusive), when renewal is
- * restricted to related courses. False from the 8th day onward.
+ * True on the 1st through 7th of even calendar months (inclusive), when
+ * renewal is restricted to related courses. Odd months remain unrestricted.
  */
 export const isRenewalRestrictedToday = (now: Date = new Date()): boolean => {
-  return now.getDate() <= RESTRICTED_WINDOW_DAYS;
+  return (now.getMonth() + 1) % 2 === 0 && now.getDate() <= RESTRICTED_WINDOW_DAYS;
 };
 
 /**
- * The month renewals are open for today (the month after `now`), as a
- * year-month key comparable with getCourseMonthKey, e.g. 2026-09-29 -> "26-10".
+ * A year-month key comparable with getCourseMonthKey.
  */
 const toMonthKey = (date: Date): string => {
   const yy = String(date.getFullYear() % 100).padStart(2, '0');
@@ -74,21 +73,31 @@ const toMonthKey = (date: Date): string => {
   return `${yy}-${mm}`;
 };
 
-export const getRenewalTargetMonth = (now: Date = new Date()): { key: string; month: number } => {
-  const target = new Date(now.getFullYear(), now.getMonth() + 1, 1);
-  return { key: toMonthKey(target), month: target.getMonth() + 1 };
+/**
+ * The two course months in the current booking cycle. An even month opens
+ * the following odd/even pair; the intervening odd month keeps that pair.
+ * October and November target November/December; December and January target
+ * January/February, including the year change.
+ */
+export const getRenewalTargetMonths = (now: Date = new Date()): { key: string; month: number }[] => {
+  const isEvenMonth = (now.getMonth() + 1) % 2 === 0;
+  const firstTargetMonth = now.getMonth() + (isEvenMonth ? 1 : 0);
+  return [0, 1].map(offset => {
+    const target = new Date(now.getFullYear(), firstTargetMonth + offset, 1);
+    return { key: toMonthKey(target), month: target.getMonth() + 1 };
+  });
 };
 
-export type RenewalWindowBlockReason = 'not-next-month' | 'not-related';
+export type RenewalWindowBlockReason = 'outside-enrollment-period' | 'not-related';
 
 /**
  * Why `candidate` cannot be renewed into today, or null when it can:
  * - A course in the same family as one the user has applied for can be
  *   picked on any day, as long as it is held after the current month.
- * - 'not-next-month': any other course must be held in the month after the
- *   current one.
- * - 'not-related': within the first 7 days, only same-family courses can be
- *   picked.
+ * - 'outside-enrollment-period': any other course must be held in one of the
+ *   two months in the current booking cycle.
+ * - 'not-related': within the first 7 days of even months, only same-family
+ *   courses can be picked.
  */
 export const getRenewalWindowBlockReason = (
   candidate: CourseDto,
@@ -101,8 +110,8 @@ export const getRenewalWindowBlockReason = (
   if (isRelated && candidateMonth !== null && candidateMonth > toMonthKey(now)) {
     return null;
   }
-  if (candidateMonth !== getRenewalTargetMonth(now).key) {
-    return 'not-next-month';
+  if (!getRenewalTargetMonths(now).some(month => month.key === candidateMonth)) {
+    return 'outside-enrollment-period';
   }
   if (isRenewalRestrictedToday(now) && !isRelated) {
     return 'not-related';
@@ -118,13 +127,14 @@ export const canRenewToCourseThisMonth = (
   return getRenewalWindowBlockReason(candidate, appliedCourses, now) === null;
 };
 
-export type NewEnrollmentBlockReason = 'not-next-month' | 'renewal-period';
+export type NewEnrollmentBlockReason = 'outside-enrollment-period' | 'renewal-period';
 
 /**
  * Why `candidate` cannot be newly enrolled into today (outside the renewal
  * flow), or null when it can. We don't know which course the user is
- * renewing from here, so the first 7 days of month X are reserved for
- * renewals and new enrollment into month X+1 courses opens on the 8th.
+ * renewing from here, so the first 7 days of even months are reserved for
+ * renewals. New enrollment opens on the 8th for the following two months,
+ * remaining open throughout the intervening odd month.
  * Courses whose code has no month (not monthly courses) are not affected.
  */
 export const getNewEnrollmentBlockReason = (
@@ -135,8 +145,8 @@ export const getNewEnrollmentBlockReason = (
   if (candidateMonth === null) {
     return null;
   }
-  if (candidateMonth !== getRenewalTargetMonth(now).key) {
-    return 'not-next-month';
+  if (!getRenewalTargetMonths(now).some(month => month.key === candidateMonth)) {
+    return 'outside-enrollment-period';
   }
   if (isRenewalRestrictedToday(now)) {
     return 'renewal-period';

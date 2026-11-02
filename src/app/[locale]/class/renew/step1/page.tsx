@@ -7,7 +7,7 @@ import {Link} from "@/i18n/navigation";
 import {getMe} from "@/libs/user";
 import CourseCard from "@/components/course-card";
 import CourseFilterButton from "@/components/course-filter-button";
-import {canRenewToCourseThisMonth, getRenewalTargetMonth, isRenewalRestrictedToday, isSameMonthAsCourse, resolveRenewalNow, sortRenewalCandidates} from "@/libs/course-renewal";
+import {canRenewToCourseThisMonth, getRenewalTargetMonths, isRenewalRestrictedToday, isSameMonthAsCourse, resolveRenewalNow, sortRenewalCandidates} from "@/libs/course-renewal";
 
 type Props = {
   params: Promise<{
@@ -43,7 +43,8 @@ export default async function CourseRenewPage(props: Props) {
 
   const { now, isDebug: isDebugDate } = resolveRenewalNow(debugDate);
   const isRestricted = isRenewalRestrictedToday(now);
-  const targetMonth = getRenewalTargetMonth(now).month;
+  const targetMonths = getRenewalTargetMonths(now);
+  const enrollmentPeriod = { startMonth: targetMonths[0].month, endMonth: targetMonths[1].month };
   const debugQuery = isDebugDate ? `&debugDate=${debugDate}` : '';
 
   const isCategoryEligible = (c: typeof courses[number]) => {
@@ -84,8 +85,8 @@ export default async function CourseRenewPage(props: Props) {
     if (isSameMonthAsCourse(c, currentCourse)) {
       return true;
     }
-    // Category-eligible, but not held next month, or blocked by the
-    // first-7-days related-course rule.
+    // Category-eligible, but outside the enrollment period, or blocked by
+    // the first-7-days related-course rule in even months.
     return !canRenewToCourseThisMonth(c, enrolledCourses, now);
   });
 
@@ -122,8 +123,8 @@ export default async function CourseRenewPage(props: Props) {
       ) : null}
       <div className="mt-2 text-xs text-brand-neutral-500 bg-brand-neutral-100 rounded-[12px] px-3 py-2">
         {isRestricted
-          ? t('CourseRenew.related-course-only-notice', { month: targetMonth })
-          : t('CourseRenew.next-month-only-notice', { month: targetMonth })}
+          ? t('CourseRenew.related-course-only-notice', enrollmentPeriod)
+          : t('CourseRenew.enrollment-period-notice', enrollmentPeriod)}
       </div>
       <div className="space-y-3 my-3">
         {canEnrollCourse.filter(c => c.id.toString() !== fromCourseId).map(course => (

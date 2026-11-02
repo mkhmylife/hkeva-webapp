@@ -9,7 +9,7 @@ import Image from "next/image";
 import {Link} from "@/i18n/navigation";
 import BackButton from "@/components/back-button";
 import {getMe} from "@/libs/user";
-import {getRenewalTargetMonth, getRenewalWindowBlockReason, isSameMonthAsCourse, resolveRenewalNow} from "@/libs/course-renewal";
+import {getRenewalTargetMonths, getRenewalWindowBlockReason, isSameMonthAsCourse, resolveRenewalNow} from "@/libs/course-renewal";
 
 type Props = {
   params: Promise<{
@@ -44,6 +44,8 @@ export default async function CourseDetailPage(props: Props) {
     return me.category.order >= course.category2.order;
   }
   const { now, isDebug: isDebugDate } = resolveRenewalNow(debugDate);
+  const targetMonths = getRenewalTargetMonths(now);
+  const enrollmentPeriod = { startMonth: targetMonths[0].month, endMonth: targetMonths[1].month };
   const renewalWindowBlockReason = getRenewalWindowBlockReason(course, enrolledCourses, now);
   const isBlockedByRenewalWindow = renewalWindowBlockReason !== null;
   const isBlockedBySameMonth = isSameMonthAsCourse(course, fromCourse);
@@ -168,8 +170,8 @@ export default async function CourseDetailPage(props: Props) {
                     disabled
                     className="block opacity-50 text-center mt-4 w-full bg-primary text-white font-semibold py-2.5 px-4 rounded-[12px] transition-colors"
                   >
-                    {renewalWindowBlockReason === 'not-next-month'
-                      ? t('CourseRenew.not-next-month-course-to-enroll', { month: getRenewalTargetMonth(now).month })
+                    {renewalWindowBlockReason === 'outside-enrollment-period'
+                      ? t('CourseRenew.outside-enrollment-period-course-to-enroll', enrollmentPeriod)
                       : t('CourseRenew.not-related-course-to-enroll')}
                   </button>
                 ) : (

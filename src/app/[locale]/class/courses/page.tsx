@@ -9,7 +9,7 @@ import CourseFilterButton from "@/components/course-filter-button";
 import {getMe} from "@/libs/user";
 import Card from "@/components/card";
 import {Volleyball} from "lucide-react";
-import {getCourseMonthKey, getNewEnrollmentBlockReason, getRenewalTargetMonth, isRenewalRestrictedToday, resolveRenewalNow} from "@/libs/course-renewal";
+import {getCourseMonthKey, getNewEnrollmentBlockReason, getRenewalTargetMonths, isRenewalRestrictedToday, resolveRenewalNow} from "@/libs/course-renewal";
 
 type Props = {
   params: Promise<{
@@ -47,6 +47,8 @@ export default async function CoursesPage(props: Props) {
 
   const { now, isDebug: isDebugDate } = resolveRenewalNow(debugDate);
   const isRenewalPeriod = isRenewalRestrictedToday(now);
+  const targetMonths = getRenewalTargetMonths(now);
+  const enrollmentPeriod = { startMonth: targetMonths[0].month, endMonth: targetMonths[1].month };
   const debugQuery = isDebugDate ? `?debugDate=${debugDate}` : '';
   const hasMonthlyCourses = courses.some(c => getCourseMonthKey(c.code) !== null);
   const isBlockedByEnrollmentWindow = (c: typeof courses[number]) => getNewEnrollmentBlockReason(c, now) !== null;
@@ -126,7 +128,7 @@ export default async function CoursesPage(props: Props) {
             </>
           ) : (
             <>
-              {t('Course.next-month-only-notice', { month: getRenewalTargetMonth(now).month })}
+              {t('Course.enrollment-period-notice', enrollmentPeriod)}
               {" "}
               {t('Course.enrollment-schedule-notice')}
             </>
