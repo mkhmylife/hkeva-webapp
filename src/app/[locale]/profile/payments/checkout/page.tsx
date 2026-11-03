@@ -7,7 +7,6 @@ import {getInvoice} from "@/libs/invoice";
 import {notFound} from "next/navigation";
 import {getEnrolledCourse, getEnrollmentDeductible} from "@/libs/course";
 import Checkout from "@/components/checkout";
-import InvoiceCountdown from "@/components/invoice-countdown";
 import { LessonEnrollmentStatus } from "@/types/enrollment";
 
 type IProps = {
@@ -51,14 +50,8 @@ export default async function PaymentCheckoutPage(props: IProps) {
             course={course}
             invoice={invoice}
             deductibles={deductibles.filter(d => d.status === LessonEnrollmentStatus.Cancelled)}
+            fpsDetails={{id: process.env.FPS_ID || 'TESTINGID', accountName: process.env.FPS_ACCOUNT_NAME || 'HKEVA'}}
           />
-
-          <div className="mt-4">
-            <InvoiceCountdown
-              updatedAt={invoice.updatedAt}
-              invoiceSource={invoice.source}
-            />
-          </div>
         </CourseCardLarge>
       </div>
     </div>

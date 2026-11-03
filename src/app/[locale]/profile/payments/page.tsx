@@ -108,15 +108,19 @@ export default async function ProfileTimetablePage(props: Props) {
                       <div className="pt-4">
                         <div className="text-right font-semibold text-xl">HK${course.invoiceItem.total.toLocaleString()}</div>
                       </div>
-                      <a className="cursor-pointer w-full bg-primary-100 rounded-xl py-2 px-6 mt-4 block text-center font-medium">
-                        {t('ProfilePayments.goto-payment')}
-                      </a>
-                      <div className="mt-4">
+                      <span className="cursor-pointer w-full bg-primary-100 rounded-xl py-2 px-6 mt-4 block text-center font-medium">
+                        {course.invoiceItem.fpsSubmittedAt && !course.invoiceItem.fpsApprovedAt
+                          ? t('FpsPayment.pending-title')
+                          : t('ProfilePayments.goto-payment')}
+                      </span>
+                      {course.invoiceItem.fpsSubmittedAt && !course.invoiceItem.fpsApprovedAt ? (
+                        <p className="mt-3 text-sm text-amber-800">{t('FpsPayment.pending-description')}</p>
+                      ) : <div className="mt-4">
                         <InvoiceCountdown
                           updatedAt={course.invoiceItem.updatedAt}
                           invoiceSource={course.invoiceItem.invoiceSource}
                         />
-                      </div>
+                      </div>}
                     </>
                   ) : null}
                 </CourseCardLarge>

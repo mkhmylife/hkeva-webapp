@@ -90,6 +90,11 @@ export interface InvoiceDto {
   bbmslId?: string;
   bbmslUrl?: string;
   stripeUrl?: string;
+  fpsReferenceUrl?: string | null;
+  fpsReferenceFilename?: string | null;
+  fpsSubmittedAt?: string | null;
+  fpsApprovedAt?: string | null;
+  fpsApprovedById?: number | null;
   promoCode?: {
     id: number;
     code: string;
@@ -110,6 +115,8 @@ export interface InvoiceItemDto {
   invoicePaid: number;
   invoiceTotal: number;
   invoiceSource?: string;
+  fpsSubmittedAt?: string | null;
+  fpsApprovedAt?: string | null;
   price: number;
   originalPrice: number;
   qty: number;
@@ -129,6 +136,8 @@ export interface InvoiceItemMiniDto {
   invoiceCode: string;
   invoiceDate: string;
   invoiceDue: number;
+  fpsSubmittedAt?: string | null;
+  fpsApprovedAt?: string | null;
   userCode: string;
   userId: number;
   userName: string;

@@ -12,11 +12,15 @@ import {useRouter} from "@/i18n/navigation";
 import {getEnrollmentDeductible} from "@/libs/course";
 import moment from "moment";
 import {unstable_rethrow} from "next/navigation";
+import FpsPayment from '@/components/fps-payment';
+import InvoiceCountdown from '@/components/invoice-countdown';
+import {canSubmitFpsPayment, isFpsPending} from '@/libs/fps-payment';
 
 type IProps = {
   course: CourseDto;
   invoice: InvoiceDto;
   deductibles: EnrollmentDto[];
+  fpsDetails: {id: string; accountName?: string};
 }
 
 type FormData = {
@@ -28,12 +32,17 @@ export default function Checkout(props: IProps) {
   const router = useRouter();
 
   const t = useTranslations();
-  const { control, setValue, handleSubmit } = useForm<FormData>();
+  const { control, setValue } = useForm<FormData>();
 
   const [invoice, setInvoice] = useState<InvoiceDto>(props.invoice);
   const [deductibles, setDeductibles] = useState<EnrollmentDto[]>(props.deductibles);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [currentTime, setCurrentTime] = useState<number>(Date.now());
+  const [currentTime, setCurrentTime] = useState<number>(() => Date.now());
+  const [paymentMethod, setPaymentMethod] = useState<'online' | 'fps'>('online');
+  const [paymentError, setPaymentError] = useState<string | null>(null);
+  const fpsPending = isFpsPending(invoice);
+  const isPaid = invoice.due <= 0;
+  const fpsAvailable = props.course.acceptFpsPayment && canSubmitFpsPayment(invoice);
 
   // Update current time every second to trigger isExpired recalculation
   useEffect(() => {
@@ -67,11 +76,14 @@ export default function Checkout(props: IProps) {
   }, [deductibles, invoice.total]);
 
   const isExpired = useMemo(() => {
-    const expiryTime = moment(invoice.updatedAt).add(10, 'minutes');
+    if (fpsPending || isPaid) return false;
+    const minutes = invoice.source === 'App' ? (invoice.stripeUrl ? 20 : 10) : 60 * 24 * 2;
+    const expiryTime = moment(invoice.updatedAt).add(minutes, 'minutes');
     return moment(currentTime).isAfter(expiryTime);
-  }, [invoice.updatedAt, currentTime]);
+  }, [invoice.updatedAt, invoice.source, invoice.stripeUrl, currentTime, fpsPending, isPaid]);
 
   const applyPoints = useCallback(async () => {
+    if (isLoading || fpsPending || isPaid) return;
     setIsLoading(true);
     try {
       const updatedInvoice = await applyPointsInInvoice(invoice.id, points);
@@ -80,9 +92,10 @@ export default function Checkout(props: IProps) {
     } finally {
       setIsLoading(false);
     }
-  }, [invoice.id, points, setValue]);
+  }, [invoice.id, points, setValue, isLoading, fpsPending, isPaid]);
 
   const removePoints = useCallback(async () => {
+    if (isLoading || fpsPending || isPaid) return;
     setIsLoading(true);
     try {
       const updatedInvoice = await unapplyPointsInInvoice(invoice.id);
@@ -93,15 +106,18 @@ export default function Checkout(props: IProps) {
     } finally {
       setIsLoading(false);
     }
-  }, [invoice.id, setValue]);
+  }, [invoice.id, setValue, isLoading, fpsPending, isPaid]);
 
   const checkout = useCallback(async (isMock: boolean) => {
-    if (props.invoice.stripeUrl) {
-      window.location.href = props.invoice.stripeUrl;
+    if (isLoading || fpsPending || isExpired || isPaid) return;
+    if (invoice.stripeUrl) {
+      window.location.href = invoice.stripeUrl;
+      return;
     }
+    setPaymentError(null);
     setIsLoading(true);
     try {
-      const { paymentUrl } = await payInvoice(props.invoice.id, isMock);
+      const { paymentUrl } = await payInvoice(invoice.id, isMock);
       if (paymentUrl) {
         // ToDo: Redirect to payment URL
         window.location.href = paymentUrl;
@@ -110,11 +126,11 @@ export default function Checkout(props: IProps) {
       router.replace(`/profile/payments?type=paid`);
     } catch (e) {
       unstable_rethrow(e);
-      console.log(e);
+      setPaymentError(t('Checkout.payment-failed'));
     } finally {
       setIsLoading(false);
     }
-  }, [props.invoice.id, router]);
+  }, [invoice.id, invoice.stripeUrl, router, t, isLoading, fpsPending, isExpired, isPaid]);
 
   return (
     <div>
@@ -124,12 +140,12 @@ export default function Checkout(props: IProps) {
         <div className="text-right">HK${(invoice.total + usedPoints).toLocaleString()}</div>
       </div>
 
-      {usedPoints > 0 ? (
+      {!fpsPending && !isPaid && (usedPoints > 0 ? (
         <div className="">
           <Controller
             control={control}
             name="points"
-            render={({field}) => (
+            render={() => (
               <>
                 <div className={`bg-primary relative rounded-lg text-sm p-2 mt-3`}>
                   <a onClick={() => removePoints()} className="flex items-center justify-between">
@@ -141,10 +157,10 @@ export default function Checkout(props: IProps) {
                         <div
                           className="bg-white absolute text-brand-light-blue rounded opacity-0 peer-checked:opacity-100 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
                           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"
-                               stroke="currentColor" stroke-width="1">
-                            <path fill-rule="evenodd"
+                               stroke="currentColor" strokeWidth="1">
+                            <path fillRule="evenodd"
                                   d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                  clip-rule="evenodd"></path>
+                                  clipRule="evenodd"></path>
                           </svg>
                         </div>
                       </label>
@@ -188,38 +204,70 @@ export default function Checkout(props: IProps) {
             )}
           />
         </div>
-      )}
+      ))}
 
       <div className="pt-4 text-right flex justify-end items-baseline">
         <div className="text-sm">{t('Checkout.total')}</div>
         <div className="text-right font-semibold text-2xl">HK${invoice.total.toLocaleString()}</div>
       </div>
 
-      <button
-        onClick={() => checkout(false)}
-        disabled={isExpired}
-        className={`w-full rounded-xl py-2 px-6 mt-4 block text-center font-medium ${
-          isExpired
-            ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
-            : 'bg-brand-500 text-white cursor-pointer'
-        }`}
-      >
-        {isExpired ? t('InvoiceCountdown.expired') : t('ProfilePayments.pay-now')}
-      </button>
+      {fpsPending ? (
+        <FpsPayment invoice={invoice} details={props.fpsDetails} disabled onSubmitted={setInvoice} onBusyChange={setIsLoading} />
+      ) : isPaid ? (
+        <p role="status" className="mt-4 rounded-xl bg-green-50 p-4 text-center font-semibold text-green-800">{t('ProfilePayments.paid')}</p>
+      ) : (
+        <>
+          {fpsAvailable ? (
+            <fieldset disabled={isLoading || isExpired} className="mt-4 space-y-2">
+              <legend className="mb-2 text-sm font-semibold">{t('Checkout.payment-method')}</legend>
+              <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-brand-neutral-200 p-3">
+                <input type="radio" name="payment-method" value="online" checked={paymentMethod === 'online'} onChange={() => setPaymentMethod('online')} />
+                {t('Checkout.online-payment')}
+              </label>
+              <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-brand-neutral-200 p-3">
+                <input type="radio" name="payment-method" value="fps" checked={paymentMethod === 'fps'} onChange={() => setPaymentMethod('fps')} />
+                {t('FpsPayment.title')}
+              </label>
+            </fieldset>
+          ) : null}
 
-      {process.env.NEXT_PUBLIC_IS_BETA === "1" ? (
-        <button
-          onClick={() => checkout(true)}
-          disabled={isExpired}
-          className={`w-full rounded-xl py-2 px-6 mt-2 block text-center font-medium ${
-            isExpired
-              ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
-              : 'bg-black text-white cursor-pointer'
-          }`}
-        >
-          {isExpired ? t('InvoiceCountdown.expired') : 'Mock Payment'}
-        </button>
-      ) : null}
+          {paymentMethod === 'fps' && fpsAvailable ? (
+            <FpsPayment invoice={invoice} details={props.fpsDetails} disabled={isExpired || isLoading} onSubmitted={setInvoice} onBusyChange={setIsLoading} />
+          ) : (
+            <>
+              <button
+                onClick={() => checkout(false)}
+                disabled={isExpired || isLoading}
+                className={`w-full rounded-xl py-2 px-6 mt-4 block text-center font-medium ${
+                  isExpired
+                    ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                    : 'bg-brand-500 text-white cursor-pointer'
+                }`}
+              >
+                {isExpired ? t('InvoiceCountdown.expired') : t('ProfilePayments.pay-now')}
+              </button>
+
+              {process.env.NEXT_PUBLIC_IS_BETA === "1" ? (
+                <button
+                  onClick={() => checkout(true)}
+                  disabled={isExpired || isLoading}
+                  className={`w-full rounded-xl py-2 px-6 mt-2 block text-center font-medium ${
+                    isExpired
+                      ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                      : 'bg-black text-white cursor-pointer'
+                  }`}
+                >
+                  {isExpired ? t('InvoiceCountdown.expired') : 'Mock Payment'}
+                </button>
+              ) : null}
+            </>
+          )}
+          {paymentError ? <p role="alert" className="mt-3 text-sm text-red-600">{paymentError}</p> : null}
+          <div className="mt-4">
+            <InvoiceCountdown updatedAt={invoice.updatedAt} invoiceSource={invoice.source} hasGatewayPayment={!!invoice.stripeUrl} />
+          </div>
+        </>
+      )}
 
       {isLoading ? (
         <div className="bg-white/50 fixed inset-0 flex justify-center items-center">

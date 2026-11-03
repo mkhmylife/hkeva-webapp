@@ -5,6 +5,9 @@
 		"new-territories": "新界"
 	},
 	"Checkout": {
+		"payment-method": "付款方式",
+		"online-payment": "網上付款",
+		"payment-failed": "未能開啟付款頁面，請稍後再試或聯絡客服。",
 		"subtotal": "小計：",
 		"total": "總計：",
 		"use-points": "使用補堂面額",
@@ -14,6 +17,23 @@
 	"InvoiceCountdown": {
 		"expired": "此帳單已過期",
 		"complete-payment-within": "請於 {timeLeft} 內完成付款"
+	},
+	"FpsPayment": {
+		"title": "FPS 轉數快付款",
+		"fps-id": "FPS ID：",
+		"account-name": "戶口名稱：",
+		"confirm-account-name": "轉帳前請向客服確認收款戶口名稱。",
+		"instructions": "請轉帳 HK${amount}，然後上載付款收據或轉帳紀錄供客服核對。",
+		"reference-label": "付款收據／轉帳紀錄（必須上載）",
+		"file-help": "支援 JPG、PNG、WebP 或 PDF，一個檔案，上限 5 MB。",
+		"review-notice": "上載後會等待客服核對，核准前帳單仍屬未付款。請勿重複付款。",
+		"submit": "提交付款紀錄",
+		"pending-title": "FPS 付款待客服核對",
+		"pending-description": "已收到付款紀錄，客服正等候核對。客服確認收款並標記為已付款後，報名才會確認。請勿重複付款。",
+		"view-reference": "查看已提交的付款紀錄",
+		"invalid-file": "請選擇不超過 5 MB 的 JPG、PNG、WebP 或 PDF 檔案。",
+		"unavailable": "此帳單目前未能提交 FPS 付款紀錄。請重新整理頁面或聯絡客服。",
+		"upload-failed": "付款紀錄未能提交，請再試一次。"
 	},
 	"Class": {
 		"class": "課程",

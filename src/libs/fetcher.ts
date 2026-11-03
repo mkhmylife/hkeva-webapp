@@ -22,11 +22,12 @@ export const fetcher = async (method: string, path: string, body?: any) => {
   if (!auth?.accessToken) {
     await redirectToLogin();
   }
+  const isFormData = typeof FormData !== 'undefined' && body instanceof FormData;
   const res = await fetch(`${process.env.API_URL || process.env.NEXT_PUBLIC_API_URL}${path}`, {
     method,
-    body: body ? JSON.stringify(body) : undefined,
+    body: isFormData ? body : body ? JSON.stringify(body) : undefined,
     headers: {
-      'Content-Type': 'application/json',
+      ...(isFormData ? {} : {'Content-Type': 'application/json'}),
       'Accept': 'application/json',
       'Authorization': `Bearer ${auth?.accessToken}`,
     }

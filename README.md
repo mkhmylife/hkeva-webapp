@@ -1,5 +1,18 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Course FPS payments
+
+Checkout offers FPS for courses with `acceptFpsPayment` enabled. Set the server
+environment variables `FPS_ID` and `FPS_ACCOUNT_NAME` to display the payee details.
+The fallback FPS ID is `TESTINGID` and the fallback account name is `HKEVA`.
+Set the corresponding environment variable to override either default.
+
+Members must upload one JPG, PNG, WebP or PDF payment reference (up to 5 MB).
+Submission leaves the invoice unpaid and shows an awaiting-review status without
+an expiry countdown. CS reviews the private reference in the admin invoice screen
+and explicitly marks the FPS payment paid to confirm enrollment. Apply the backend
+FPS invoice migration before deploying this flow.
+
 ## Getting Started
 
 First, run the development server:

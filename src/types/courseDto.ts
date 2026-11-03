@@ -11,6 +11,7 @@ export interface CourseDto {
   description?: string;
   pricePerLesson?: number;
   pricePerCourse?: number;
+  acceptFpsPayment: boolean;
   duration?: number;
   notes?: string;
   displayColor?: string;

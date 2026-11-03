@@ -5,6 +5,9 @@
 		"new-territories": ""
 	},
 	"Checkout": {
+		"payment-method": "Payment method",
+		"online-payment": "Online payment",
+		"payment-failed": "Unable to open payment. Please try again or contact customer service.",
 		"subtotal": "",
 		"total": "",
 		"use-points": "",
@@ -14,6 +17,23 @@
 	"InvoiceCountdown": {
 		"expired": "This invoice has expired",
 		"complete-payment-within": "Please complete payment within {timeLeft}"
+	},
+	"FpsPayment": {
+		"title": "FPS payment",
+		"fps-id": "FPS ID:",
+		"account-name": "Account name:",
+		"confirm-account-name": "Confirm the account name with customer service before transferring.",
+		"instructions": "Transfer HK${amount}, then upload your payment receipt or transfer record for customer service to review.",
+		"reference-label": "Payment receipt / transfer record (required)",
+		"file-help": "Upload one JPG, PNG, WebP or PDF file, up to 5 MB.",
+		"review-notice": "Your invoice remains unpaid until customer service verifies your payment. Please do not pay again.",
+		"submit": "Submit payment reference",
+		"pending-title": "FPS payment awaiting CS review",
+		"pending-description": "Your payment reference has been received and is awaiting customer service review. Enrollment is confirmed only after CS verifies receipt and marks the invoice paid. Please do not pay again.",
+		"view-reference": "View submitted payment reference",
+		"invalid-file": "Choose a JPG, PNG, WebP or PDF file no larger than 5 MB.",
+		"unavailable": "This invoice cannot accept an FPS reference right now. Refresh the page or contact customer service.",
+		"upload-failed": "Your payment reference could not be submitted. Please try again."
 	},
 	"Class": {
 		"class": "",
