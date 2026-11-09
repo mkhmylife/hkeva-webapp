@@ -20,6 +20,11 @@
 	},
 	"FpsPayment": {
 		"title": "FPS payment",
+		"bank": "Bank:",
+		"bank-boc": "Bank of China (HK)",
+		"bank-hsbc": "HSBC",
+		"bank-account": "Bank account:",
+		"details-unavailable": "Payment details are unavailable for this course. Please contact customer service before transferring.",
 		"fps-id": "FPS ID:",
 		"account-name": "Account name:",
 		"confirm-account-name": "Confirm the account name with customer service before transferring.",

@@ -8,6 +8,7 @@ import {notFound} from "next/navigation";
 import {getEnrolledCourse, getEnrollmentDeductible} from "@/libs/course";
 import Checkout from "@/components/checkout";
 import { LessonEnrollmentStatus } from "@/types/enrollment";
+import {getFpsPaymentDetails} from '@/libs/fps-payment';
 
 type IProps = {
   searchParams: Promise<{
@@ -50,7 +51,7 @@ export default async function PaymentCheckoutPage(props: IProps) {
             course={course}
             invoice={invoice}
             deductibles={deductibles.filter(d => d.status === LessonEnrollmentStatus.Cancelled)}
-            fpsDetails={{id: process.env.FPS_ID || 'TESTINGID', accountName: process.env.FPS_ACCOUNT_NAME || 'HKEVA'}}
+            fpsDetails={getFpsPaymentDetails(course.code)}
           />
         </CourseCardLarge>
       </div>

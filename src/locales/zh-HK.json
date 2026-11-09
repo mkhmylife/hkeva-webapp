@@ -20,6 +20,11 @@
 	},
 	"FpsPayment": {
 		"title": "FPS 轉數快付款",
+		"bank": "銀行：",
+		"bank-boc": "中國銀行 Bank of China (HK)",
+		"bank-hsbc": "HSBC",
+		"bank-account": "銀行戶口：",
+		"details-unavailable": "此課程暫未提供收款資料，轉帳前請先聯絡客服。",
 		"fps-id": "FPS ID：",
 		"account-name": "戶口名稱：",
 		"confirm-account-name": "轉帳前請向客服確認收款戶口名稱。",

@@ -2,7 +2,7 @@
 
 import {fetcher} from "@/libs/fetcher";
 import {InvoiceDto} from "@/types/invoiceDto";
-import {isValidFpsReference} from '@/libs/fps-payment';
+import {isValidFpsReference, requiresFpsPayment} from '@/libs/fps-payment';
 
 export const getInvoice = async (id: number) => {
   const res = await fetcher('GET', `/app/invoice/${id}`);
@@ -33,6 +33,10 @@ export const unapplyPointsInInvoice = async (id: number) => {
 }
 
 export const payInvoice = async (id: number, isMock: boolean) => {
+  const invoice = await getInvoice(id);
+  if (requiresFpsPayment(invoice)) {
+    throw new Error('This course only accepts FPS payment');
+  }
   const res = await fetcher('POST', `/app/invoice/${id}/pay`, {
     isMock,
   });

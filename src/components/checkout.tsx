@@ -14,13 +14,13 @@ import moment from "moment";
 import {unstable_rethrow} from "next/navigation";
 import FpsPayment from '@/components/fps-payment';
 import InvoiceCountdown from '@/components/invoice-countdown';
-import {canSubmitFpsPayment, isFpsPending} from '@/libs/fps-payment';
+import {canSubmitFpsPayment, isFpsPending, requiresFpsPayment, type FpsPaymentDetails} from '@/libs/fps-payment';
 
 type IProps = {
   course: CourseDto;
   invoice: InvoiceDto;
   deductibles: EnrollmentDto[];
-  fpsDetails: {id: string; accountName?: string};
+  fpsDetails: FpsPaymentDetails | null;
 }
 
 type FormData = {
@@ -38,11 +38,11 @@ export default function Checkout(props: IProps) {
   const [deductibles, setDeductibles] = useState<EnrollmentDto[]>(props.deductibles);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [currentTime, setCurrentTime] = useState<number>(() => Date.now());
-  const [paymentMethod, setPaymentMethod] = useState<'online' | 'fps'>('online');
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const fpsPending = isFpsPending(invoice);
   const isPaid = invoice.due <= 0;
   const fpsAvailable = props.course.acceptFpsPayment && canSubmitFpsPayment(invoice);
+  const fpsOnly = props.course.acceptFpsPayment || requiresFpsPayment(invoice);
 
   // Update current time every second to trigger isExpired recalculation
   useEffect(() => {
@@ -109,7 +109,7 @@ export default function Checkout(props: IProps) {
   }, [invoice.id, setValue, isLoading, fpsPending, isPaid]);
 
   const checkout = useCallback(async (isMock: boolean) => {
-    if (isLoading || fpsPending || isExpired || isPaid) return;
+    if (isLoading || fpsOnly || fpsPending || isExpired || isPaid) return;
     if (invoice.stripeUrl) {
       window.location.href = invoice.stripeUrl;
       return;
@@ -130,7 +130,7 @@ export default function Checkout(props: IProps) {
     } finally {
       setIsLoading(false);
     }
-  }, [invoice.id, invoice.stripeUrl, router, t, isLoading, fpsPending, isExpired, isPaid]);
+  }, [invoice.id, invoice.stripeUrl, router, t, isLoading, fpsOnly, fpsPending, isExpired, isPaid]);
 
   return (
     <div>
@@ -217,22 +217,10 @@ export default function Checkout(props: IProps) {
         <p role="status" className="mt-4 rounded-xl bg-green-50 p-4 text-center font-semibold text-green-800">{t('ProfilePayments.paid')}</p>
       ) : (
         <>
-          {fpsAvailable ? (
-            <fieldset disabled={isLoading || isExpired} className="mt-4 space-y-2">
-              <legend className="mb-2 text-sm font-semibold">{t('Checkout.payment-method')}</legend>
-              <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-brand-neutral-200 p-3">
-                <input type="radio" name="payment-method" value="online" checked={paymentMethod === 'online'} onChange={() => setPaymentMethod('online')} />
-                {t('Checkout.online-payment')}
-              </label>
-              <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-brand-neutral-200 p-3">
-                <input type="radio" name="payment-method" value="fps" checked={paymentMethod === 'fps'} onChange={() => setPaymentMethod('fps')} />
-                {t('FpsPayment.title')}
-              </label>
-            </fieldset>
-          ) : null}
-
-          {paymentMethod === 'fps' && fpsAvailable ? (
-            <FpsPayment invoice={invoice} details={props.fpsDetails} disabled={isExpired || isLoading} onSubmitted={setInvoice} onBusyChange={setIsLoading} />
+          {fpsOnly ? (
+            fpsAvailable ? (
+              <FpsPayment invoice={invoice} details={props.fpsDetails} disabled={isExpired || isLoading} onSubmitted={setInvoice} onBusyChange={setIsLoading} />
+            ) : <p role="alert" className="mt-4 text-sm text-red-600">{t('FpsPayment.unavailable')}</p>
           ) : (
             <>
               <button

@@ -2,10 +2,16 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Course FPS payments
 
-Checkout offers FPS for courses with `acceptFpsPayment` enabled. Set the server
-environment variables `FPS_ID` and `FPS_ACCOUNT_NAME` to display the payee details.
-The fallback FPS ID is `TESTINGID` and the fallback account name is `HKEVA`.
-Set the corresponding environment variable to override either default.
+Courses with `acceptFpsPayment` enabled accept FPS only; checkout and the payment
+API block card and mock payments for these invoices. Payee details follow the
+course code prefix:
+
+- `WTF`: In Express Recreation Management (Hong Kong) Ltd, Bank of China (HK),
+  account `012-611-2-058945-3`, FPS ID `116641648`.
+- `YO`: YOUTH OUTREACH, HSBC, account `195-9-036771`. No FPS ID is configured.
+
+Other prefixes show a customer service notice instead of transfer details or an
+upload form. `FPS_ID` and `FPS_ACCOUNT_NAME` are no longer used.
 
 Members must upload one JPG, PNG, WebP or PDF payment reference (up to 5 MB).
 Submission leaves the invoice unpaid and shows an awaiting-review status without

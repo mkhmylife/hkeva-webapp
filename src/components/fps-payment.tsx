@@ -4,12 +4,12 @@ import {useState, type FormEvent} from 'react';
 import {useLocale, useTranslations} from 'next-intl';
 import {unstable_rethrow} from 'next/navigation';
 import {submitFpsReference} from '@/libs/invoice';
-import {FPS_REFERENCE_TYPES, isFpsPending, isValidFpsReference} from '@/libs/fps-payment';
+import {FPS_REFERENCE_TYPES, isFpsPending, isValidFpsReference, type FpsPaymentDetails} from '@/libs/fps-payment';
 import type {InvoiceDto} from '@/types/invoiceDto';
 
 type Props = {
   invoice: InvoiceDto;
-  details: {id: string; accountName?: string};
+  details: FpsPaymentDetails | null;
   disabled: boolean;
   onSubmitted: (invoice: InvoiceDto) => void;
   onBusyChange: (busy: boolean) => void;
@@ -31,6 +31,10 @@ export default function FpsPayment({invoice, details, disabled, onSubmitted, onB
         </a>
       </section>
     );
+  }
+
+  if (!details) {
+    return <p role="alert" className="mt-4 text-sm text-red-600">{t('details-unavailable')}</p>;
   }
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
@@ -62,12 +66,13 @@ export default function FpsPayment({invoice, details, disabled, onSubmitted, onB
         <h2 className="font-semibold">{t('title')}</h2>
         <p className="mt-2 text-sm text-brand-neutral-500">{t('instructions', {amount: invoice.due.toLocaleString()})}</p>
         <dl className="mt-3 space-y-1 text-sm">
-          <div className="flex gap-2"><dt>{t('fps-id')}</dt><dd className="break-all font-semibold select-all">{details.id}</dd></div>
-          {details.accountName ? (
-            <div className="flex gap-2"><dt>{t('account-name')}</dt><dd className="font-semibold">{details.accountName}</dd></div>
+          <div className="flex gap-2"><dt>{t('account-name')}</dt><dd className="font-semibold">{details.accountName}</dd></div>
+          <div className="flex gap-2"><dt>{t('bank')}</dt><dd className="font-semibold">{t(`bank-${details.bank}`)}</dd></div>
+          <div className="flex gap-2"><dt>{t('bank-account')}</dt><dd className="break-all font-semibold select-all">{details.bankAccount}</dd></div>
+          {details.fpsId ? (
+            <div className="flex gap-2"><dt>{t('fps-id')}</dt><dd className="break-all font-semibold select-all">{details.fpsId}</dd></div>
           ) : null}
         </dl>
-        {!details.accountName ? <p className="mt-2 text-sm text-brand-neutral-500">{t('confirm-account-name')}</p> : null}
       </div>
       <div>
         <label htmlFor="fps-reference" className="mb-2 block text-sm font-medium">{t('reference-label')}</label>
