@@ -23,6 +23,7 @@ export interface CourseDto {
   category2?: CategoryDto;
   /** This member's original classes that can renew into this district-team course. */
   districtTeamOriginalCourseIds?: number[];
+  remainingPlaces?: number | null;
   isFixedRoom: boolean;
 }
 
