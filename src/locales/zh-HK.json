@@ -84,6 +84,7 @@
 		"grade-too-low-to-enroll": "年齡/水平不適用",
 		"all-lessons-covered": "所有課堂均已預約補堂",
 		"booked-substitution-dates": "已預約補堂日期：{dates}",
+		"substitution-marker": "補",
 		"is-full": "已滿",
 		"enrollment-period-notice": "可續報{startMonth}月及{endMonth}月符合報名資格的課堂，或與在讀課程相關的其他未來月份課堂",
 		"next-step": "下一步",

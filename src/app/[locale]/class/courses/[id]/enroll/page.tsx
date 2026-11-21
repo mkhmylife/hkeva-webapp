@@ -92,9 +92,14 @@ export default async function CourseDetailPage(props: Props) {
                   return (
                     <div
                       key={lesson.id}
-                      className={`${isSubstitution ? 'bg-gray-100 text-gray-500' : 'text-brand-neutral-900'} ${isHoliday ? 'opacity-40' : ''} border border-gray-200 text-center text-sm rounded-xl py-2 px-2`}
+                      className={`relative ${isSubstitution ? 'bg-gray-100 text-gray-500' : 'text-brand-neutral-900'} ${isHoliday ? 'opacity-40' : ''} border border-gray-200 text-center text-sm rounded-xl py-2 px-2`}
                     >
                       {moment(lesson.date).format("D/MM")}
+                      {isSubstitution && (
+                        <span className="absolute top-0 right-1 -translate-y-1/2 rounded-full bg-gray-200 px-1 text-[10px] leading-3 font-medium whitespace-nowrap text-gray-700">
+                          {t('CourseRenew.substitution-marker')}
+                        </span>
+                      )}
                     </div>
                   )
                 })}
