@@ -11,6 +11,7 @@ type IProps = {
   course: CourseDto;
   holidays: string[];
   isRenewal?: boolean;
+  disabled?: boolean;
   fromCourseId?: string;
   debugDate?: string;
 }
@@ -51,7 +52,7 @@ export default function CourseEnrollButton(props: IProps) {
     <>
       <button
         onClick={() => enroll()}
-        disabled={isLoading}
+        disabled={props.disabled || isLoading}
         className="block text-center mt-4 w-full bg-brand-500 text-white font-semibold py-2.5 px-4 rounded-[12px] transition-colors"
       >
         {t('Course.confirm-and-pay')}

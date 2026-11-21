@@ -1,5 +1,5 @@
 import {getTranslations} from "next-intl/server";
-import {getCourse} from "@/libs/course";
+import {getCourseForEnrollment} from "@/libs/course";
 import {ChevronLeft} from "lucide-react";
 import {convertWeekdayToNumber} from "@/libs/weekday";
 import moment from "moment/moment";
@@ -30,21 +30,21 @@ export default async function CourseDetailPage(props: Props) {
 
   const { id: courseId, locale } = await props.params;
   const { holiday1, holiday2, debugDate } = await props.searchParams;
-  const [course, me] = await Promise.all([
-    getCourse(Number(courseId)),
+  const [{ course, allLessons, substitutionDates, status }, me] = await Promise.all([
+    getCourseForEnrollment(Number(courseId)),
     getMe()
   ]);
 
   // Opened directly with a course not open for new enrollment today: send the
   // user back to the course page, which explains why.
   const { now, isDebug: isDebugDate } = resolveRenewalNow(debugDate);
-  if (getNewEnrollmentBlockReason(course, now)) {
+  if (!status.canEnroll || getNewEnrollmentBlockReason(course, now)) {
     redirect({ href: `/class/courses/${courseId}${isDebugDate ? `?debugDate=${debugDate}` : ''}`, locale });
   }
 
-  const lessons = course.lessons;
-  const firstLesson = lessons && lessons.length > 0 ? lessons[0] : null;
-  const enrolledLessons = lessons?.filter((lesson) => {
+  const substitutionIds = new Set(status.substitutionLessonIds);
+  const firstLesson = allLessons[0];
+  const enrolledLessons = course.lessons.filter((lesson) => {
     const isHoliday = lesson.date === holiday1 || lesson.date === holiday2;
     return !isHoliday;
   });
@@ -66,7 +66,7 @@ export default async function CourseDetailPage(props: Props) {
         ) : null}
 
         <div className="mt-2">
-          <CourseCardLarge course={course}>
+          <CourseCardLarge course={{ ...course, lessons: allLessons }}>
             <div className="">
               <div className="flex items-center gap-2">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -86,18 +86,24 @@ export default async function CourseDetailPage(props: Props) {
                 </p>
               </div>
               <div className="grid grid-cols-5 gap-2 pt-3 border-b border-gray-200 pb-3">
-                {lessons?.map((lesson) => {
+                {allLessons.map((lesson) => {
+                  const isSubstitution = substitutionIds.has(lesson.id);
                   const isHoliday = lesson.date === holiday1 || lesson.date === holiday2;
                   return (
                     <div
                       key={lesson.id}
-                      className={`${isHoliday ? 'opacity-40' : ''} border border-gray-200 text-center text-brand-neutral-900 text-sm rounded-xl py-2 px-2`}
+                      className={`${isSubstitution ? 'bg-gray-100 text-gray-500' : 'text-brand-neutral-900'} ${isHoliday ? 'opacity-40' : ''} border border-gray-200 text-center text-sm rounded-xl py-2 px-2`}
                     >
                       {moment(lesson.date).format("D/MM")}
                     </div>
                   )
                 })}
               </div>
+              {substitutionDates.length > 0 && (
+                <p className="mt-2 text-sm">{t('CourseRenew.booked-substitution-dates', {
+                  dates: substitutionDates.map(date => moment(date).format('D/MM')).join(', '),
+                })}</p>
+              )}
               <div className="flex justify-end mt-3 text-xl font-bold">
                 HK${course.pricePerCourse ? course.pricePerCourse.toLocaleString() : (course.pricePerLesson! * (enrolledLessons?.length || 0)).toLocaleString()}
               </div>
@@ -112,6 +118,7 @@ export default async function CourseDetailPage(props: Props) {
         />
 
         <CourseEnrollButton
+          disabled={!enrolledLessons?.length}
           course={course}
           holidays={[holiday1, holiday2].filter(h => h !== undefined)}
           debugDate={isDebugDate ? debugDate : undefined}

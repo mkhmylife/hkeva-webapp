@@ -82,6 +82,8 @@
 		"current-course": "",
 		"enrolled": "Enrolled",
 		"grade-too-low-to-enroll": "",
+		"all-lessons-covered": "All lessons are already booked as make-up lessons",
+		"booked-substitution-dates": "Already booked as make-up lessons: {dates}",
 		"is-full": "",
 		"enrollment-period-notice": "You can renew into eligible courses in months {startMonth} and {endMonth}, or a related course in another future month",
 		"next-step": "Next",

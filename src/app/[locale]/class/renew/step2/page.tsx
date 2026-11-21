@@ -52,6 +52,7 @@ export default async function CourseDetailPage(props: Props) {
     if (blockReason === 'district-team-original-class-only') {
       return <span className="text-xs">{t('Course.district-team-original-class-only')}</span>;
     }
+    if (status.status === 'all-lessons-covered') return t('CourseRenew.all-lessons-covered');
     if (!status.canEnroll) return t('CourseRenew.is-full');
     if (!isCategoryEligible()) return t('CourseRenew.grade-too-low-to-enroll');
     if (blockReason === 'same-month') return t('CourseRenew.same-month-course-to-enroll');

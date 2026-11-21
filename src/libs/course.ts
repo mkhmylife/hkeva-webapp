@@ -74,7 +74,19 @@ export const getCourseEnrollmentStatus = async (id: number) => {
   if (!res.ok) {
     throw new Error(res.statusText);
   }
-  return await res.json() as { status: 'enrolled' | 'available' | 'unavailable'; canEnroll: boolean };
+  return await res.json() as { status: string; canEnroll: boolean; substitutionLessonIds: number[] };
+}
+
+export const getCourseForEnrollment = async (id: number) => {
+  const [course, status] = await Promise.all([getCourse(id), getCourseEnrollmentStatus(id)]);
+  const covered = new Set(status.substitutionLessonIds);
+  const lessons = course.lessons ?? [];
+  return {
+    course: { ...course, lessons: lessons.filter(lesson => !covered.has(lesson.id)) },
+    allLessons: lessons,
+    substitutionDates: lessons.filter(lesson => covered.has(lesson.id)).map(lesson => lesson.date),
+    status,
+  };
 }
 
 export const getLesson = async (id: number) => {

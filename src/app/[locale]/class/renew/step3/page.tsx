@@ -1,5 +1,5 @@
 import {getTranslations} from "next-intl/server";
-import {getCourse, getEnrolledCourses} from "@/libs/course";
+import {getCourse, getCourseForEnrollment, getEnrolledCourses} from "@/libs/course";
 import {ChevronLeft, Volleyball} from "lucide-react";
 import {convertWeekdayToNumber} from "@/libs/weekday";
 import moment from "moment/moment";
@@ -31,8 +31,8 @@ export default async function CourseDetailPage(props: Props) {
 
   const { locale } = await props.params;
   const { fromCourseId, toCourseId, holiday1, holiday2, debugDate } = await props.searchParams;
-  const [course, fromCourse, enrolledCourses] = await Promise.all([
-    getCourse(Number(toCourseId)),
+  const [{ course, substitutionDates, status }, fromCourse, enrolledCourses] = await Promise.all([
+    getCourseForEnrollment(Number(toCourseId)),
     getCourse(Number(fromCourseId)),
     getEnrolledCourses(),
   ]);
@@ -41,7 +41,7 @@ export default async function CourseDetailPage(props: Props) {
   // to step 2, which explains why.
   const { now, isDebug: isDebugDate } = resolveRenewalNow(debugDate);
   const debugQuery = isDebugDate ? `&debugDate=${debugDate}` : '';
-  if (getRenewalBlockReason(course, fromCourse, enrolledCourses, now)) {
+  if (!status.canEnroll || getRenewalBlockReason(course, fromCourse, enrolledCourses, now)) {
     redirect({ href: `/class/renew/step2?fromCourseId=${fromCourseId}&toCourseId=${toCourseId}${debugQuery}`, locale });
   }
 
@@ -101,6 +101,11 @@ export default async function CourseDetailPage(props: Props) {
                   )
                 })}
               </div>
+              {substitutionDates.length > 0 && (
+                <p className="mt-2 text-sm">{t('CourseRenew.booked-substitution-dates', {
+                  dates: substitutionDates.map(date => moment(date).format('D/MM')).join(', '),
+                })}</p>
+              )}
               <div className="flex justify-end mt-3 text-xl font-bold">
                 HK${course.pricePerCourse ? course.pricePerCourse.toLocaleString() : (course.pricePerLesson! * (enrolledLessons?.length || 0)).toLocaleString()}
               </div>
@@ -115,6 +120,7 @@ export default async function CourseDetailPage(props: Props) {
         />
 
         <CourseEnrollButton
+          disabled={!enrolledLessons?.length}
           course={course}
           holidays={[holiday1, holiday2].filter(h => h !== undefined)}
           isRenewal={true}

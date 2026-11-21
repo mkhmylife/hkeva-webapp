@@ -165,7 +165,7 @@ export default async function CourseDetailPage(props: Props) {
                     </button>
                   ) : !status.canEnroll ? (
                     <button disabled className="opacity-50 block text-center mt-4 w-full bg-primary text-white font-semibold py-2.5 px-4 rounded-[12px] transition-colors">
-                      {t('CourseRenew.is-full')}
+                      {t(status.status === 'all-lessons-covered' ? 'CourseRenew.all-lessons-covered' : 'CourseRenew.is-full')}
                     </button>
                   ) : (
                     <Link
