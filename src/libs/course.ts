@@ -201,7 +201,17 @@ export const enrollCourse = async (
   if (blockedReason) {
     return { blockedReason };
   }
-  const res = await fetcher('POST', `/app/course/${courseId}/enroll`, { holidays, isRenewal });
+  const res = await fetcher('POST', `/app/course/${courseId}/enroll`, {
+    holidays,
+    isRenewal,
+    fromCourseId: isRenewal ? options.fromCourseId : undefined,
+  });
+  if (res.status === 403) {
+    const error = await res.json().catch(() => null);
+    if (error?.blockedReason === 'district-team-original-class-only') {
+      return { blockedReason: 'district-team-original-class-only' };
+    }
+  }
   if (!res.ok) {
     throw new Error(res.statusText);
   }

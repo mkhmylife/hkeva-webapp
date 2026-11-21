@@ -8,17 +8,19 @@ import Image from "next/image";
 
 type Props = {
   course: CourseDto;
+  muted?: boolean;
+  disabledReason?: string;
 }
 
 export default function CourseCard(props: Props) {
 
   const t = useTranslations();
 
-  const { course } = props;
+  const { course, muted, disabledReason } = props;
 
   const firstLessson = course.lessons && course.lessons.length > 0 ? course.lessons[0] : null;
 
-  return (
+  const card = (
     <Card className="flex gap-3 items-center">
       <div className="relative aspect-square bg-primary/10 h-24 shrink-0 overflow-hidden rounded-[12px] flex items-center justify-center">
         {course.imageUrl ? (
@@ -76,9 +78,12 @@ export default function CourseCard(props: Props) {
             <></>
           )}</p>
         </div>
-        {/*<p className="text-xs tracking-wider font-medium text-brand-neutral-500">{course.code}</p>*/}
+        {disabledReason && <p className="mt-2 text-[10px] font-medium">{disabledReason}</p>}
       </div>
     </Card>
-  )
+  );
+  return muted || disabledReason
+    ? <div aria-disabled={disabledReason ? true : undefined} className="grayscale opacity-60">{card}</div>
+    : card;
 
 }

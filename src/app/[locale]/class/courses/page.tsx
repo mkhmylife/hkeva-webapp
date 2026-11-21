@@ -51,7 +51,7 @@ export default async function CoursesPage(props: Props) {
   const enrollmentPeriod = { startMonth: targetMonths[0].month, endMonth: targetMonths[1].month };
   const debugQuery = isDebugDate ? `?debugDate=${debugDate}` : '';
   const hasMonthlyCourses = courses.some(c => getCourseMonthKey(c.code) !== null);
-  const isBlockedByEnrollmentWindow = (c: typeof courses[number]) => getNewEnrollmentBlockReason(c, now) !== null;
+  const getBlockReason = (c: typeof courses[number]) => getNewEnrollmentBlockReason(c, now);
 
   const isEligible = (c: typeof courses[number]) => {
     const categories = [c.category?.order, c.category2?.order].filter(o => o !== undefined);
@@ -67,10 +67,10 @@ export default async function CoursesPage(props: Props) {
     }
     return categoryOrder <= me.category.order;
   };
-  const canEnrollCourse = courses.filter(c => isEligible(c) && !isBlockedByEnrollmentWindow(c));
+  const canEnrollCourse = courses.filter(c => isEligible(c) && !getBlockReason(c));
   const cannotEnrollCourse = courses.filter(c => {
-    // Otherwise eligible, but not open for new enrollment today.
-    if (isEligible(c) && isBlockedByEnrollmentWindow(c)) {
+    const blockReason = getBlockReason(c);
+    if (blockReason === 'district-team-original-class-only' || (isEligible(c) && blockReason)) {
       return true;
     }
     if (!me.level) {
@@ -152,9 +152,11 @@ export default async function CoursesPage(props: Props) {
                 <CourseCard course={course} />
               </Link>
             ))}
-            {cannotEnrollCourse.map((course) => (
-              <Link key={course.id} href={`/class/courses/${course.id}${debugQuery}`} className="block opacity-50">
-                <CourseCard course={course} />
+            {cannotEnrollCourse.map(course => getBlockReason(course) === 'district-team-original-class-only' ? (
+              <CourseCard key={course.id} course={course} disabledReason={t('Course.district-team-original-class-only')} />
+            ) : (
+              <Link key={course.id} href={`/class/courses/${course.id}${debugQuery}`} className="block">
+                <CourseCard course={course} muted />
               </Link>
             ))}
           </>

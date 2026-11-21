@@ -88,10 +88,31 @@ export const getRenewalTargetMonths = (now: Date = new Date()): { key: string; m
   });
 };
 
-export type RenewalWindowBlockReason = 'outside-enrollment-period' | 'not-related';
+type DistrictTeamBlockReason = 'district-team-original-class-only';
+
+const isDistrictTeamCourse = (course: CourseDto) =>
+  course.category?.name === '區隊' || course.category2?.name === '區隊';
+
+export const getDistrictTeamBlockReason = (
+  candidate: CourseDto,
+  fromCourseId?: number,
+): DistrictTeamBlockReason | null => {
+  if (!isDistrictTeamCourse(candidate)) {
+    return null;
+  }
+  const originalCourseIds = candidate.districtTeamOriginalCourseIds ?? [];
+  const isOriginalMember = fromCourseId === undefined
+    ? originalCourseIds.length > 0
+    : originalCourseIds.includes(fromCourseId);
+  return isOriginalMember ? null : 'district-team-original-class-only';
+};
+
+export type RenewalWindowBlockReason = 'outside-enrollment-period' | 'not-related' | DistrictTeamBlockReason;
 
 /**
  * Why `candidate` cannot be renewed into today, or null when it can:
+ * - District teams require membership of the original class, including when
+ *   the date would normally allow enrollment in unrelated courses.
  * - A course in the same family as one the user has applied for can be
  *   picked on any day, as long as it is held after the current month.
  * - 'outside-enrollment-period': any other course must be held in one of the
@@ -103,9 +124,15 @@ export const getRenewalWindowBlockReason = (
   candidate: CourseDto,
   appliedCourses: { course: CourseDto }[],
   now: Date = new Date(),
+  fromCourseId?: number,
 ): RenewalWindowBlockReason | null => {
+  const districtTeamBlockReason = getDistrictTeamBlockReason(candidate, fromCourseId);
+  if (districtTeamBlockReason) {
+    return districtTeamBlockReason;
+  }
   const candidateMonth = getCourseMonthKey(candidate.code);
-  const isRelated = appliedCourses.some(ac => isRelatedCourseCode(ac.course.code, candidate.code));
+  const isRelated = isDistrictTeamCourse(candidate) ||
+    appliedCourses.some(ac => isRelatedCourseCode(ac.course.code, candidate.code));
   // Month keys are "YY-MM", so string comparison orders them chronologically.
   if (isRelated && candidateMonth !== null && candidateMonth > toMonthKey(now)) {
     return null;
@@ -127,7 +154,7 @@ export const canRenewToCourseThisMonth = (
   return getRenewalWindowBlockReason(candidate, appliedCourses, now) === null;
 };
 
-export type NewEnrollmentBlockReason = 'outside-enrollment-period' | 'renewal-period';
+export type NewEnrollmentBlockReason = 'outside-enrollment-period' | 'renewal-period' | DistrictTeamBlockReason;
 
 /**
  * Why `candidate` cannot be newly enrolled into today (outside the renewal
@@ -141,6 +168,10 @@ export const getNewEnrollmentBlockReason = (
   candidate: CourseDto,
   now: Date = new Date(),
 ): NewEnrollmentBlockReason | null => {
+  const districtTeamBlockReason = getDistrictTeamBlockReason(candidate);
+  if (districtTeamBlockReason) {
+    return districtTeamBlockReason;
+  }
   const candidateMonth = getCourseMonthKey(candidate.code);
   if (candidateMonth === null) {
     return null;
@@ -210,10 +241,11 @@ export const getRenewalBlockReason = (
   appliedCourses: { course: CourseDto }[],
   now: Date = new Date(),
 ): RenewalBlockReason | null => {
-  if (isSameMonthAsCourse(candidate, fromCourse)) {
-    return 'same-month';
+  const windowBlockReason = getRenewalWindowBlockReason(candidate, appliedCourses, now, fromCourse.id);
+  if (windowBlockReason === 'district-team-original-class-only') {
+    return windowBlockReason;
   }
-  return getRenewalWindowBlockReason(candidate, appliedCourses, now);
+  return isSameMonthAsCourse(candidate, fromCourse) ? 'same-month' : windowBlockReason;
 };
 
 export type EnrollmentBlockReason = RenewalBlockReason | NewEnrollmentBlockReason | 'missing-from-course';

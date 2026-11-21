@@ -49,6 +49,7 @@
 	"Course": {
 		"confirm-and-pay": "",
 		"confirm-enrollment": "",
+		"district-team-original-class-only": "Only current members of this district team can renew.",
 		"enrollment-blocked": "",
 		"enrollment-opens-on-8th": "New enrollment opens on {month}/8",
 		"enrollment-schedule-notice": "The 1st–7th of even-numbered months are reserved for same-class renewals. Enrollment for the following two months opens on the 8th.",
@@ -81,13 +82,13 @@
 		"enrolled": "Enrolled",
 		"grade-too-low-to-enroll": "",
 		"is-full": "",
-		"enrollment-period-notice": "You can renew into any course in months {startMonth} and {endMonth}, or a related course in another future month",
+		"enrollment-period-notice": "You can renew into eligible courses in months {startMonth} and {endMonth}, or a related course in another future month",
 		"next-step": "Next",
 		"outside-enrollment-period-course-to-enroll": "You can only renew into courses in months {startMonth} and {endMonth}, or related courses in future months",
 		"not-related-course-to-enroll": "Only same-class renewals are available on the 1st–7th of even-numbered months",
 		"only-two-holidays-can-be-picked": "",
 		"payment": "Payment",
-		"related-course-only-notice": "The 1st–7th of even-numbered months are reserved for same-class renewals. From the 8th, you can also choose any course in months {startMonth} and {endMonth}.",
+		"related-course-only-notice": "The 1st–7th of even-numbered months are reserved for same-class renewals. From the 8th, you can also choose eligible courses in months {startMonth} and {endMonth}.",
 		"same-month-course-to-enroll": "",
 		"select-course": "",
 		"title": ""

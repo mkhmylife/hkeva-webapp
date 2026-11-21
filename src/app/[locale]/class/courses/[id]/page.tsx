@@ -138,7 +138,11 @@ export default async function CourseDetailPage(props: Props) {
           course={course}
         />
 
-          {canUserEnroll() ? (
+          {enrollmentBlockReason === 'district-team-original-class-only' && status.status !== 'enrolled' ? (
+            <button disabled className="block text-center mt-4 w-full bg-brand-neutral-200 text-brand-neutral-900 font-semibold py-2.5 px-4 rounded-[12px]">
+              <span className="text-xs">{t('Course.district-team-original-class-only')}</span>
+            </button>
+          ) : canUserEnroll() ? (
             <>
               {status.status === 'enrolled' ? (
                 <button disabled className="opacity-50 block text-center mt-4 w-full bg-primary text-white font-semibold py-2.5 px-4 rounded-[12px] transition-colors">

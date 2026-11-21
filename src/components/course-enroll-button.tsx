@@ -30,7 +30,9 @@ export default function CourseEnrollButton(props: IProps) {
         debugDate: props.debugDate,
       });
       if (result.blockedReason) {
-        alert(t('Course.enrollment-blocked'));
+        alert(result.blockedReason === 'district-team-original-class-only'
+          ? t('Course.district-team-original-class-only')
+          : t('Course.enrollment-blocked'));
         // The page re-checks the rules and redirects to where the reason is shown.
         router.refresh();
         return;

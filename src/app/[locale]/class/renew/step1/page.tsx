@@ -7,7 +7,7 @@ import {Link} from "@/i18n/navigation";
 import {getMe} from "@/libs/user";
 import CourseCard from "@/components/course-card";
 import CourseFilterButton from "@/components/course-filter-button";
-import {canRenewToCourseThisMonth, getRenewalTargetMonths, isRenewalRestrictedToday, isSameMonthAsCourse, resolveRenewalNow, sortRenewalCandidates} from "@/libs/course-renewal";
+import {getRenewalBlockReason, getRenewalTargetMonths, isRenewalRestrictedToday, resolveRenewalNow, sortRenewalCandidates} from "@/libs/course-renewal";
 
 type Props = {
   params: Promise<{
@@ -57,38 +57,18 @@ export default async function CourseRenewPage(props: Props) {
     return !!(c.category2 && c.category2.order <= me.category.order);
   };
 
-  const sortedCourses = sortRenewalCandidates(courses, currentCourse);
-
-  const canEnrollCourse = sortedCourses.filter(c => {
-    if (enrolledCourses.some(ec => ec.course.id === c.id)) {
-      return false;
-    }
-    if (!isCategoryEligible(c)) {
-      return false;
-    }
-    if (isSameMonthAsCourse(c, currentCourse)) {
-      return false;
-    }
-    if (!canRenewToCourseThisMonth(c, enrolledCourses, now)) {
-      return false;
-    }
-    return true;
-  });
-  const cannotEnrollCourse = sortedCourses.filter(c => {
-    if (enrolledCourses.some(ec => ec.course.id === c.id)) {
-      return true;
-    }
-    if (!isCategoryEligible(c)) {
-      return false;
-    }
-    // Category-eligible, but in the same month as the current course.
-    if (isSameMonthAsCourse(c, currentCourse)) {
-      return true;
-    }
-    // Category-eligible, but outside the enrollment period, or blocked by
-    // the first-7-days related-course rule in even months.
-    return !canRenewToCourseThisMonth(c, enrolledCourses, now);
-  });
+  const enrolledCourseIds = new Set(enrolledCourses.map(({course}) => course.id));
+  const courseOptions = sortRenewalCandidates(courses, currentCourse)
+    .filter(course => course.id !== currentCourse.id)
+    .flatMap(course => {
+      const reason = getRenewalBlockReason(course, currentCourse, enrolledCourses, now);
+      const enrolled = enrolledCourseIds.has(course.id);
+      if (!enrolled && !isCategoryEligible(course) && reason !== 'district-team-original-class-only') {
+        return [];
+      }
+      return [{course, reason, unavailable: enrolled || reason !== null}];
+    })
+    .sort((a, b) => Number(a.unavailable) - Number(b.unavailable));
 
   return (
     <div className="container px-4 sm:px-6 lg:px-8">
@@ -127,14 +107,11 @@ export default async function CourseRenewPage(props: Props) {
           : t('CourseRenew.enrollment-period-notice', enrollmentPeriod)}
       </div>
       <div className="space-y-3 my-3">
-        {canEnrollCourse.filter(c => c.id.toString() !== fromCourseId).map(course => (
+        {courseOptions.map(({course, reason, unavailable}) => reason === 'district-team-original-class-only' ? (
+          <CourseCard key={course.id} course={course} disabledReason={t('Course.district-team-original-class-only')} />
+        ) : (
           <Link key={course.id} href={`/class/renew/step2?fromCourseId=${fromCourseId}&toCourseId=${course.id}${debugQuery}`} className="block">
-            <CourseCard course={course} />
-          </Link>
-        ))}
-        {cannotEnrollCourse.filter(c => c.id.toString() !== fromCourseId).map(course => (
-          <Link key={course.id} href={`/class/renew/step2?fromCourseId=${fromCourseId}&toCourseId=${course.id}${debugQuery}`} className="block opacity-50">
-            <CourseCard course={course} />
+            <CourseCard course={course} muted={unavailable} />
           </Link>
         ))}
       </div>

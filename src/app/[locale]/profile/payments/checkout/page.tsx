@@ -5,9 +5,8 @@ import CourseCardLarge from "@/components/course-card-large";
 import {getTranslations} from "next-intl/server";
 import {getInvoice} from "@/libs/invoice";
 import {notFound} from "next/navigation";
-import {getEnrolledCourse, getEnrollmentDeductible} from "@/libs/course";
+import {getEnrolledCourse} from "@/libs/course";
 import Checkout from "@/components/checkout";
-import { LessonEnrollmentStatus } from "@/types/enrollment";
 import {getFpsPaymentDetails} from '@/libs/fps-payment';
 
 type IProps = {
@@ -23,10 +22,9 @@ export default async function PaymentCheckoutPage(props: IProps) {
 
   const { invoiceId, courseId } = await props.searchParams;
 
-  const [invoice, course, deductibles] = await Promise.all([
+  const [invoice, course] = await Promise.all([
     getInvoice(Number(invoiceId)),
-    getEnrolledCourse(Number(courseId)),
-    getEnrollmentDeductible()
+    getEnrolledCourse(Number(courseId))
   ]);
   if (!course || invoice.items.find(i => i.course?.id === course.id) == null) {
     notFound();
@@ -50,7 +48,6 @@ export default async function PaymentCheckoutPage(props: IProps) {
           <Checkout
             course={course}
             invoice={invoice}
-            deductibles={deductibles.filter(d => d.status === LessonEnrollmentStatus.Cancelled)}
             fpsDetails={getFpsPaymentDetails(course.code)}
           />
         </CourseCardLarge>

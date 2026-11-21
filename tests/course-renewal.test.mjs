@@ -204,3 +204,34 @@ test('renewal server action enforces original-class priority and opens unrelated
     }
   }
 });
+
+test('district team membership is required for both renewal and general enrollment', async () => {
+  const original = course('26-11', 'TK', 2);
+  const otherTeam = course('26-11', 'SK', 3);
+  const applied = [{course: original}, {course: otherTeam}];
+  const target = {...course('26-12', 'TK'), category: {name: '區隊'}};
+  for (const districtTeamOriginalCourseIds of [[], undefined]) {
+    const {api, posts} = courseApi({candidate: {...target, districtTeamOriginalCourseIds}, from: original, applied});
+    for (const isRenewal of [false, true]) {
+      const result = await api.enrollCourse(target.id, [], isRenewal, {fromCourseId: original.id, debugDate: '2026-11-21'});
+      assert.equal(result.blockedReason, 'district-team-original-class-only');
+    }
+    assert.equal(posts.length, 0);
+  }
+
+  const candidate = {...target, districtTeamOriginalCourseIds: [original.id]};
+  const {api, posts} = courseApi({candidate, from: otherTeam, applied});
+  const crossTeam = await api.enrollCourse(candidate.id, [], true, {fromCourseId: otherTeam.id, debugDate: '2026-11-21'});
+  assert.equal(crossTeam.blockedReason, 'district-team-original-class-only');
+  assert.equal(posts.length, 0);
+  assert.equal((await api.enrollCourse(candidate.id, [], false, {debugDate: '2026-11-21'})).invoice.id, 100);
+});
+
+test('a configured district team can renew across a code change during original-class priority', async () => {
+  const from = course('26-12', 'OLD', 2);
+  const candidate = {...course('27-01', 'NEW'), category2: {name: '區隊'}, districtTeamOriginalCourseIds: [from.id]};
+  const {api, posts} = courseApi({candidate, from});
+  assert.equal(renewal.getNewEnrollmentBlockReason(candidate, date('2026-12-07')), 'renewal-period');
+  assert.equal((await api.enrollCourse(candidate.id, [], true, {fromCourseId: from.id, debugDate: '2026-12-07'})).invoice.id, 100);
+  assert.equal(posts[0].fromCourseId, from.id);
+});

@@ -4,12 +4,11 @@ import {Controller, useForm} from "react-hook-form";
 import {useTranslations} from "next-intl";
 import {CourseDto} from "@/types/courseDto";
 import {InvoiceDto} from "@/types/invoiceDto";
-import {EnrollmentDto, LessonEnrollmentStatus} from "@/types/enrollment";
+import {LessonEnrollmentStatus} from "@/types/enrollment";
 import {useCallback, useEffect, useMemo, useState} from "react";
 import {Pencil} from "lucide-react";
 import {applyPointsInInvoice, payInvoice, unapplyPointsInInvoice} from "@/libs/invoice";
 import {useRouter} from "@/i18n/navigation";
-import {getEnrollmentDeductible} from "@/libs/course";
 import moment from "moment";
 import {unstable_rethrow} from "next/navigation";
 import FpsPayment from '@/components/fps-payment';
@@ -19,7 +18,6 @@ import {canSubmitFpsPayment, isFpsPending, requiresFpsPayment, type FpsPaymentDe
 type IProps = {
   course: CourseDto;
   invoice: InvoiceDto;
-  deductibles: EnrollmentDto[];
   fpsDetails: FpsPaymentDetails | null;
 }
 
@@ -35,7 +33,6 @@ export default function Checkout(props: IProps) {
   const { control, setValue } = useForm<FormData>();
 
   const [invoice, setInvoice] = useState<InvoiceDto>(props.invoice);
-  const [deductibles, setDeductibles] = useState<EnrollmentDto[]>(props.deductibles);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [currentTime, setCurrentTime] = useState<number>(() => Date.now());
   const [paymentError, setPaymentError] = useState<string | null>(null);
@@ -64,16 +61,7 @@ export default function Checkout(props: IProps) {
     return total;
   }, [invoice]);
 
-  const points = useMemo(() => {
-    const sorted = [...deductibles].sort((a, b) => b.value - a.value).slice(0, 2);
-    let availablePoints = 0;
-    for (const deductible of sorted) {
-      if (availablePoints + deductible.value <= invoice.total) {
-        availablePoints += deductible.value;
-      }
-    }
-    return availablePoints;
-  }, [deductibles, invoice.total]);
+  const points = invoice.availableLessonCredit ?? 0;
 
   const isExpired = useMemo(() => {
     if (fpsPending || isPaid) return false;
@@ -83,7 +71,7 @@ export default function Checkout(props: IProps) {
   }, [invoice.updatedAt, invoice.source, invoice.stripeUrl, currentTime, fpsPending, isPaid]);
 
   const applyPoints = useCallback(async () => {
-    if (isLoading || fpsPending || isPaid) return;
+    if (isLoading || fpsPending || isPaid || invoice.stripeUrl) return;
     setIsLoading(true);
     try {
       const updatedInvoice = await applyPointsInInvoice(invoice.id, points);
@@ -92,21 +80,19 @@ export default function Checkout(props: IProps) {
     } finally {
       setIsLoading(false);
     }
-  }, [invoice.id, points, setValue, isLoading, fpsPending, isPaid]);
+  }, [invoice.id, invoice.stripeUrl, points, setValue, isLoading, fpsPending, isPaid]);
 
   const removePoints = useCallback(async () => {
-    if (isLoading || fpsPending || isPaid) return;
+    if (isLoading || fpsPending || isPaid || invoice.stripeUrl) return;
     setIsLoading(true);
     try {
       const updatedInvoice = await unapplyPointsInInvoice(invoice.id);
-      const updatedDeductibles = await getEnrollmentDeductible();
       setInvoice(updatedInvoice);
-      setDeductibles(updatedDeductibles);
       setValue('points', 0);
     } finally {
       setIsLoading(false);
     }
-  }, [invoice.id, setValue, isLoading, fpsPending, isPaid]);
+  }, [invoice.id, invoice.stripeUrl, setValue, isLoading, fpsPending, isPaid]);
 
   const checkout = useCallback(async (isMock: boolean) => {
     if (isLoading || fpsOnly || fpsPending || isExpired || isPaid) return;
@@ -148,7 +134,7 @@ export default function Checkout(props: IProps) {
             render={() => (
               <>
                 <div className={`bg-primary relative rounded-lg text-sm p-2 mt-3`}>
-                  <a onClick={() => removePoints()} className="flex items-center justify-between">
+                  <a aria-disabled={!!invoice.stripeUrl} onClick={() => removePoints()} className="flex items-center justify-between">
                     <div className="flex gap-2 items-center">
                       <label className="flex items-center cursor-pointer relative">
                         <input type="checkbox" checked readOnly
@@ -192,8 +178,7 @@ export default function Checkout(props: IProps) {
                       <p className="text-md">{t('Checkout.use-points')}</p>
                     </a>
                     <p className="mt-1 text-brand-neutral-500 font-light">{t('Checkout.use-points-to-save', {
-                      // points: field.value ? field.value : props.invoice.total > points ? points : props.invoice.total,
-                      save: field.value ? field.value : invoice.total > points ? points : invoice.total,
+                      save: points,
                     })}</p>
                     <div className="absolute top-0 right-0 p-2">
                       <Pencil className="size-3.5"/>

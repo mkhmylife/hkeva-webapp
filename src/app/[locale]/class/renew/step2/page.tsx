@@ -9,7 +9,7 @@ import Image from "next/image";
 import {Link} from "@/i18n/navigation";
 import BackButton from "@/components/back-button";
 import {getMe} from "@/libs/user";
-import {getRenewalTargetMonths, getRenewalWindowBlockReason, isSameMonthAsCourse, resolveRenewalNow} from "@/libs/course-renewal";
+import {getRenewalBlockReason, getRenewalTargetMonths, resolveRenewalNow} from "@/libs/course-renewal";
 
 type Props = {
   params: Promise<{
@@ -46,15 +46,20 @@ export default async function CourseDetailPage(props: Props) {
   const { now, isDebug: isDebugDate } = resolveRenewalNow(debugDate);
   const targetMonths = getRenewalTargetMonths(now);
   const enrollmentPeriod = { startMonth: targetMonths[0].month, endMonth: targetMonths[1].month };
-  const renewalWindowBlockReason = getRenewalWindowBlockReason(course, enrolledCourses, now);
-  const isBlockedByRenewalWindow = renewalWindowBlockReason !== null;
-  const isBlockedBySameMonth = isSameMonthAsCourse(course, fromCourse);
-  const canUserEnroll = () => {
-    if (!status.canEnroll || !isCategoryEligible()) {
-      return false;
+  const blockReason = getRenewalBlockReason(course, fromCourse, enrolledCourses, now);
+  const getDisabledLabel = () => {
+    if (status.status === 'enrolled') return t('CourseRenew.enrolled');
+    if (blockReason === 'district-team-original-class-only') {
+      return <span className="text-xs">{t('Course.district-team-original-class-only')}</span>;
     }
-    return !isBlockedBySameMonth && !isBlockedByRenewalWindow;
-  }
+    if (!status.canEnroll) return t('CourseRenew.is-full');
+    if (!isCategoryEligible()) return t('CourseRenew.grade-too-low-to-enroll');
+    if (blockReason === 'same-month') return t('CourseRenew.same-month-course-to-enroll');
+    if (blockReason === 'outside-enrollment-period') return t('CourseRenew.outside-enrollment-period-course-to-enroll', enrollmentPeriod);
+    if (blockReason === 'not-related') return t('CourseRenew.not-related-course-to-enroll');
+    return null;
+  };
+  const disabledLabel = getDisabledLabel();
 
   const lessons = course.lessons;
   const firstLesson = lessons && lessons.length > 0 ? lessons[0] : null;
@@ -143,48 +148,10 @@ export default async function CourseDetailPage(props: Props) {
           course={course}
         />
 
-        {!canUserEnroll() ? (
-          <>
-            {status.status === 'enrolled' ? (
-              <button disabled className="opacity-50 block text-center mt-4 w-full bg-primary text-white font-semibold py-2.5 px-4 rounded-[12px] transition-colors">
-                {t('CourseRenew.enrolled')}
-              </button>
-            ) : (
-              <>
-                {!status.canEnroll ? (
-                  <button
-                    disabled
-                    className="block opacity-50 text-center mt-4 w-full bg-primary text-white font-semibold py-2.5 px-4 rounded-[12px] transition-colors"
-                  >
-                    {t('CourseRenew.is-full')}
-                  </button>
-                ) : isCategoryEligible() && isBlockedBySameMonth ? (
-                  <button
-                    disabled
-                    className="block opacity-50 text-center mt-4 w-full bg-primary text-white font-semibold py-2.5 px-4 rounded-[12px] transition-colors"
-                  >
-                    {t('CourseRenew.same-month-course-to-enroll')}
-                  </button>
-                ) : isCategoryEligible() && isBlockedByRenewalWindow ? (
-                  <button
-                    disabled
-                    className="block opacity-50 text-center mt-4 w-full bg-primary text-white font-semibold py-2.5 px-4 rounded-[12px] transition-colors"
-                  >
-                    {renewalWindowBlockReason === 'outside-enrollment-period'
-                      ? t('CourseRenew.outside-enrollment-period-course-to-enroll', enrollmentPeriod)
-                      : t('CourseRenew.not-related-course-to-enroll')}
-                  </button>
-                ) : (
-                  <button
-                    disabled
-                    className="block opacity-50 text-center mt-4 w-full bg-primary text-white font-semibold py-2.5 px-4 rounded-[12px] transition-colors"
-                  >
-                    {t('CourseRenew.grade-too-low-to-enroll')}
-                  </button>
-                )}
-              </>
-            )}
-          </>
+        {disabledLabel !== null ? (
+          <button disabled className="block opacity-50 text-center mt-4 w-full bg-primary text-white font-semibold py-2.5 px-4 rounded-[12px] transition-colors">
+            {disabledLabel}
+          </button>
         ) : (
           <Link
             href={`/class/renew/step3?fromCourseId=${fromCourseId}&toCourseId=${toCourseId}${isDebugDate ? `&debugDate=${debugDate}` : ''}`}

@@ -49,6 +49,7 @@
 	"Course": {
 		"confirm-and-pay": "確認報讀",
 		"confirm-enrollment": "報讀課程",
+		"district-team-original-class-only": "此區隊只限原班學員續報",
 		"enrollment-blocked": "此課程目前未能報讀，請重新選擇課程",
 		"enrollment-opens-on-8th": "新報名將於{month}月8日開放",
 		"enrollment-schedule-notice": "逢雙數月1至7日只開放原班續報，8日起開放報讀隨後兩個月的課堂。",
@@ -81,13 +82,13 @@
 		"enrolled": "已報讀",
 		"grade-too-low-to-enroll": "年齡/水平不適用",
 		"is-full": "已滿",
-		"enrollment-period-notice": "可續報{startMonth}月及{endMonth}月的任何課堂，或與在讀課程相關的其他未來月份課堂",
+		"enrollment-period-notice": "可續報{startMonth}月及{endMonth}月符合報名資格的課堂，或與在讀課程相關的其他未來月份課堂",
 		"next-step": "下一步",
 		"outside-enrollment-period-course-to-enroll": "只可續報{startMonth}月及{endMonth}月的課堂或與在讀課程相關的未來課堂",
 		"not-related-course-to-enroll": "逢雙數月1至7日只可原班續報",
 		"only-two-holidays-can-be-picked": "最多只可選擇2堂",
 		"payment": "付款",
-		"related-course-only-notice": "逢雙數月1至7日只開放原班續報（相同課程的其他月份），8日起亦可選擇{startMonth}月及{endMonth}月的任何課堂",
+		"related-course-only-notice": "逢雙數月1至7日只開放原班續報（相同課程的其他月份），8日起亦可選擇{startMonth}月及{endMonth}月符合報名資格的課堂",
 		"same-month-course-to-enroll": "不能續報與在讀課程相同月份的課堂",
 		"select-course": "選擇課堂",
 		"title": "續報"

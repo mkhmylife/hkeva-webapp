@@ -85,6 +85,7 @@ export interface InvoiceDto {
   }[];
   // paymentMethods: PaymentMethodsInput['paymentMethods'];
   total: number;
+  availableLessonCredit?: number;
   paid: number;
   due: number;
   bbmslId?: string;

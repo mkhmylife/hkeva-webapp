@@ -21,6 +21,8 @@ export interface CourseDto {
   defaultRoom?: RoomDto;
   category?: CategoryDto;
   category2?: CategoryDto;
+  /** This member's original classes that can renew into this district-team course. */
+  districtTeamOriginalCourseIds?: number[];
   isFixedRoom: boolean;
 }
 
