@@ -13,7 +13,8 @@ const invoice = {
   updatedAt: new Date().toISOString(),
   items: [{course: {id: 12, code: 'WTF001', acceptFpsPayment: true}}],
 };
-const translations = (namespace) => (key) => namespace ? `${namespace}.${key}` : key;
+const translations = (namespace) => (key, values) =>
+  key === 'Checkout.use-points-to-save' ? `HK$${values.save}` : namespace ? `${namespace}.${key}` : key;
 const componentImports = {
   react: React,
   'react/jsx-runtime': jsxRuntime,
@@ -67,7 +68,6 @@ const Checkout = loadSource('src/components/checkout.tsx', {
   'react-hook-form': require('react-hook-form'),
   'lucide-react': {Pencil: 'span'},
   '@/i18n/navigation': {useRouter: () => ({replace: () => {}})},
-  '@/libs/course': {},
   moment: {default: require('moment')},
   '@/components/fps-payment': {default: FpsPayment},
   '@/components/invoice-countdown': {default: () => React.createElement('p', null, 'expiry countdown')},
@@ -76,10 +76,16 @@ const Checkout = loadSource('src/components/checkout.tsx', {
 
 function checkoutHtml(currentInvoice, course = {code: 'WTF001', acceptFpsPayment: true}) {
   return renderToStaticMarkup(React.createElement(Checkout, {
-    invoice: currentInvoice, course, deductibles: [],
+    invoice: currentInvoice, course,
     fpsDetails: fps.getFpsPaymentDetails(course.code),
   }));
 }
+
+test('checkout displays the available lesson credit quoted on the invoice', () => {
+  const html = checkoutHtml({...invoice, total: 2700, due: 2700, availableLessonCredit: 580});
+  assert.match(html, /HK\$580/);
+  assert.doesNotMatch(html, /opacity-50 pointer-events-none/);
+});
 
 test('checkout shows FPS instructions directly and never offers card or mock payments for FPS courses', () => {
   const html = checkoutHtml(invoice);
