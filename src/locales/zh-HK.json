@@ -199,7 +199,7 @@
 		"passwords-do-not-match": "密碼不符"
 	},
 	"ProfilePayments": {
-		"deductible": "可扣減金額",
+		"deductible": "可用補堂額",
 		"deductible-amount": "可補堂面額",
 		"deductible-expired-at": "面額將於 {date} 過期",
 		"goto-payment": "前往付款",
