@@ -1,4 +1,4 @@
-import {getEnrollment, getLesson} from "@/libs/course";
+import {getEnrollment, getEnrollmentSwappableLessons} from "@/libs/course";
 import {getTranslations} from "next-intl/server";
 import EnrollmentCard from "@/components/enrollment-card";
 import {ArrowDown, ChevronLeft} from "lucide-react";
@@ -24,7 +24,11 @@ export default async function EnrollmentSubstitutionSwapToPage(props: Props) {
   if (!canApplyEnrollmentSubstitution(enrollment)) {
     notFound();
   }
-  const swapToLesson = await getLesson(swapToLessonId);
+  const swappableLessons = await getEnrollmentSwappableLessons(enrollment.id);
+  const swapToLesson = swappableLessons.find(lesson => lesson.id === Number(swapToLessonId));
+  if (!swapToLesson) {
+    notFound();
+  }
 
   const t = await getTranslations();
 
@@ -56,7 +60,7 @@ export default async function EnrollmentSubstitutionSwapToPage(props: Props) {
             />
           </div>
           <div className="flex justify-center items-center">
-            <div className="size-[97px] shadow-md bg-primary-900 text-white rounded-full flex justify-center items-center">
+            <div className="z-10 size-[97px] shadow-md bg-primary-900 text-white rounded-full flex justify-center items-center">
               <ArrowDown className="size-[65px]"/>
             </div>
           </div>
